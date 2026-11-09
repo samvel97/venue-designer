@@ -4,7 +4,7 @@ import {
 } from "Layout/Layout/Seats/constants/seatsConstants";
 import { IRowData } from "Layout/Layout/Seats/types/seatsTypes";
 import { createSeats } from "./dragging";
-import { generateLinesAndSeats } from "./generateLinesAndSeats";
+import { AREA_ORIGIN, generateLinesAndSeats } from "./generateLinesAndSeats";
 import { getStoredNumberingMode, isContinuousNumbering } from "./seatNumbering";
 
 const seatOrders = (rows: IRowData[]) =>
@@ -69,6 +69,33 @@ describe("generateLinesAndSeats", () => {
     const next = generate(RowTypeEnums.ROW_TO_ROW, existing);
     expect(seatOrders(next)[0]).toEqual([13, 14, 15, 16]);
     expect(next[0].rowOrder).toBe("4");
+  });
+});
+
+describe("generateLinesAndSeats placement", () => {
+  const seatYs = (rows: IRowData[]) =>
+    rows.flatMap((row) => row.seats.map((seat) => seat.properties.y));
+
+  it("places the first block at the area's top-left corner", () => {
+    const rows = generate(RowTypeEnums.START_AT_ONE);
+    expect(rows[0].seats[0].properties.x).toBe(AREA_ORIGIN);
+    expect(Math.min(...seatYs(rows))).toBe(AREA_ORIGIN + 8); // + seatRadius
+  });
+
+  it("places a new block below existing rows instead of on top of them", () => {
+    const existing = generate(RowTypeEnums.START_AT_ONE);
+    const next = generate(RowTypeEnums.START_AT_ONE, existing);
+    const existingBottom = Math.max(...seatYs(existing));
+    const nextTop = Math.min(...seatYs(next));
+    // One empty row (18px pitch) between the blocks.
+    expect(nextTop - existingBottom).toBe(2 * 18);
+  });
+
+  it("stacks several blocks without overlap", () => {
+    const first = generate(RowTypeEnums.START_AT_ONE);
+    const second = generate(RowTypeEnums.START_AT_ONE, first);
+    const third = generate(RowTypeEnums.START_AT_ONE, [...first, ...second]);
+    expect(Math.min(...seatYs(third))).toBeGreaterThan(Math.max(...seatYs(second)));
   });
 });
 

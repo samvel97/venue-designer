@@ -2,6 +2,20 @@ import { RowTypeEnums } from "Layout/Layout/Seats/constants/seatsConstants";
 import { IRowData, ISeatsData } from "Layout/Layout/Seats/types/seatsTypes";
 import { isContinuousNumbering } from "./seatNumbering";
 
+/** Seat-editor coordinate of the selected area's top-left corner. */
+export const AREA_ORIGIN = 10000;
+
+/** Largest seat center Y among existing rows, or null when there are none. */
+const existingRowsBottom = (rows: IRowData[]): number | null => {
+  let bottom: number | null = null;
+  for (const row of rows) {
+    for (const seat of row.seats ?? []) {
+      if (bottom === null || seat.properties.y > bottom) bottom = seat.properties.y;
+    }
+  }
+  return bottom;
+};
+
 export function generateLinesAndSeats({
   multipleSeatsAndRows,
   seatsRows,
@@ -24,9 +38,19 @@ export function generateLinesAndSeats({
   nextIdRef: { current: number };
   selectedAreaId: string | undefined;
 }): IRowData[] {
-  const origin = 10000;
+  // Seat coordinates are relative to the selected area, whose top-left
+  // corner sits at (AREA_ORIGIN, AREA_ORIGIN) in the seat editor.
+  const originX = AREA_ORIGIN;
+  // Place a new block below the existing rows (leaving one empty row) so it
+  // does not cover them; the first block starts at the area's top-left.
+  const lowestSeatY = existingRowsBottom(seatsRows);
+  const originY =
+    lowestSeatY === null
+      ? AREA_ORIGIN
+      : lowestSeatY - seatRadius + 2 * Math.abs(multipleSeatsAndRows.lineSpacing);
 
   const getPosition = (
+    origin: number,
     index: number,
     count: number,
     spacing: number
@@ -45,6 +69,7 @@ export function generateLinesAndSeats({
     { length: multipleSeatsAndRows.linesCount },
     (_, lineIndex) => {
       const y = getPosition(
+        originY,
         lineIndex,
         multipleSeatsAndRows.linesCount,
         multipleSeatsAndRows.lineSpacing
@@ -54,6 +79,7 @@ export function generateLinesAndSeats({
         { length: multipleSeatsAndRows.seatsCountPerLine },
         (_, seatIndex) => {
           const x = getPosition(
+            originX,
             seatIndex,
             multipleSeatsAndRows.seatsCountPerLine,
             multipleSeatsAndRows.seatSpacing
