@@ -6,7 +6,7 @@ import {
   calculatingSelectedRowsMInCoords,
 } from "./calculatingSelectedRowsMInCoords";
 import { IStandardProperties } from "types/types";
-import { localStorageRowsKey } from "Layout/Layout/Seats/constants/seatsConstants";
+import { getStoredNumberingMode, isContinuousNumbering } from "./seatNumbering";
 
 export const createSeats = (
   startX: number,
@@ -23,7 +23,7 @@ export const createSeats = (
   const spacing = Math.abs(+seatSpacing);
 
   const seatsCount = Math.floor(Math.abs(width) / +spacing);
-  const byOrder = JSON.parse(localStorage.getItem(localStorageRowsKey) ?? "");
+  const byOrder = isContinuousNumbering(getStoredNumberingMode());
 
   if (spacing) {
     const seats = Array.from({ length: seatsCount }, (_, index) => {
@@ -69,9 +69,7 @@ export const resizingRow = (
   seatWidth: number,
   selectedRows: IRowData[]
 ) => {
-  const byOrder = JSON.parse(
-    localStorage.getItem(localStorageRowsKey) ?? "false"
-  );
+  const byOrder = isContinuousNumbering(getStoredNumberingMode());
 
   let currentSeatOrder = 1;
 

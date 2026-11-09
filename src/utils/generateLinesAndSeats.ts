@@ -1,5 +1,6 @@
 import { RowTypeEnums } from "Layout/Layout/Seats/constants/seatsConstants";
 import { IRowData, ISeatsData } from "Layout/Layout/Seats/types/seatsTypes";
+import { isContinuousNumbering } from "./seatNumbering";
 
 export function generateLinesAndSeats({
   multipleSeatsAndRows,
@@ -35,7 +36,8 @@ export function generateLinesAndSeats({
       : origin + index * spacing;
   };
 
-  let currentSeatOrder = rowByOrder
+  const continuous = isContinuousNumbering(rowByOrder);
+  let currentSeatOrder = continuous
     ? seatsRows?.at(-1)?.seats?.at(-1)?.seatOrder ?? 0
     : 0;
 
@@ -56,7 +58,7 @@ export function generateLinesAndSeats({
             multipleSeatsAndRows.seatsCountPerLine,
             multipleSeatsAndRows.seatSpacing
           );
-          const seatOrder = rowByOrder ? ++currentSeatOrder : seatIndex + 1;
+          const seatOrder = continuous ? ++currentSeatOrder : seatIndex + 1;
 
           return {
             localId: seatIndex,
