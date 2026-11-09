@@ -26,7 +26,7 @@ export interface IStandardProperties extends Coords {
   height: number;
 }
 export type SvgElementType = SVGSVGElement | null;
-export type SvgContainerType = HTMLDivElement | null;
+export type SvgContainerType = HTMLElement | null;
 
 export interface IMInMax {
   smallestX: number;

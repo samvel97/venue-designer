@@ -9,9 +9,10 @@ import { type IRowData, type ISeatsData, type TActionType } from "../types/seats
 import RowsComponent from "./Rows/RowsComponent";
 import { type IStandardProperties } from "@/types/types";
 import CoordinateAxis from "./CoordinateAxis/CoordinateAxis";
-import Grid from "@/components/canvas/Grid";
+import Grid, { CANVAS_SIZE } from "@/components/canvas/Grid";
 
 interface ISeatsSvg {
+  zoom: number;
   ref: Ref<SVGSVGElement | null>;
   tempSeats: IRowData[];
   seatsRows: IRowData[];
@@ -34,6 +35,7 @@ interface ISeatsSvg {
 }
 const SeatsSvg = ({
   ref,
+  zoom,
   tempSeats,
   seatsRows,
   selectedRows,
@@ -80,8 +82,9 @@ const SeatsSvg = ({
       tabIndex={0}
       className="block bg-white outline-none"
       ref={ref}
-      width={20000}
-      height={20000}
+      width={CANVAS_SIZE * zoom}
+      height={CANVAS_SIZE * zoom}
+      viewBox={`0 0 ${CANVAS_SIZE} ${CANVAS_SIZE}`}
       onContextMenu={(e) => e.preventDefault()}
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}

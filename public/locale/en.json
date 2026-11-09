@@ -52,7 +52,10 @@
     "name": "Name",
     "order": "Row name",
     "numbering": "Seat numbering",
-    "rows": "Selected rows"
+    "rows": "Selected rows",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "zoom_reset": "Reset zoom"
   },
   "rightSide": {
     "floor": "Floor",

@@ -18,6 +18,7 @@ import { useGetAreasQuery } from "@/api/api";
 import { reducer, initialState } from "./Reducer/areasReducer";
 import { useSearchParams } from "react-router";
 import { isTypingTarget } from "@/utils/isTypingTarget";
+import { toSvgPoint } from "@/utils/svgPoint";
 import { useAppDispatch } from "@/store/hooks";
 import { setAreas, setFloorProps, setFloorsCount, setValidations } from "@/store/venueSlice";
 import { useSelector } from "react-redux";
@@ -258,14 +259,10 @@ export const useAreas = () => {
   );
 
   const handleSelectArea = useCallback(
-    (event: React.MouseEvent, area: IAreaData, scale: number) => {
+    (event: React.MouseEvent, area: IAreaData) => {
       if (svgRef.current && toolTypeRef?.current === toolType.select) {
         selectOnShapeRef.current = true;
-        const rect = svgRef.current.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const scaledX = x / scale;
-        const scaledY = y / scale;
+        const { x: pointX, y: pointY } = toSvgPoint(svgRef.current, event);
         const { x: areaX, y: areaY } = area.properties;
         if (event.ctrlKey) {
           let newSelectedAreas = [];
@@ -282,19 +279,19 @@ export const useAreas = () => {
           dispatch({ type: ActionType.SET_SELECTED_AREAS, payload: [area] });
           dispatch({
             type: ActionType.SET_MOUSE_OFFSET_X,
-            payload: scaledX - areaX,
+            payload: pointX - areaX,
           });
           dispatch({
             type: ActionType.SET_MOUSE_OFFSET_Y,
-            payload: scaledY - areaY,
+            payload: pointY - areaY,
           });
           if (area.rows.length) {
             const selectedRowsAreaForRotating = calculatingSelectedRowsMInCoords(area.rows);
             dispatch({
               type: ActionType.SET_ROWS_MOUSE_OFFSET,
               payload: {
-                x: scaledX - selectedRowsAreaForRotating.x,
-                y: scaledY - selectedRowsAreaForRotating.y,
+                x: pointX - selectedRowsAreaForRotating.x,
+                y: pointY - selectedRowsAreaForRotating.y,
               },
             });
           }
@@ -304,13 +301,9 @@ export const useAreas = () => {
     [selectedArea, mouseOffsetX, mouseOffsetY, rowsMouseOffset],
   );
   const handleSelectFloor = useCallback(
-    (event: React.MouseEvent, floor: FloorPropTypes, scale: number) => {
+    (event: React.MouseEvent, floor: FloorPropTypes) => {
       if (svgRef.current && toolTypeRef?.current === toolType.select && floor) {
-        const rect = svgRef.current.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const scaledX = x / scale;
-        const scaledY = y / scale;
+        const { x: pointX, y: pointY } = toSvgPoint(svgRef.current, event);
         selectOnFloorRef.current = true;
         if (event.ctrlKey && selectedFloor) {
           dispatch({ type: ActionType.SET_SELECTED_FLOOR, payload: null });
@@ -320,11 +313,11 @@ export const useAreas = () => {
         dispatch({ type: ActionType.SET_SELECTED_FLOOR, payload: floor });
         dispatch({
           type: ActionType.SET_MOUSE_OFFSET_X,
-          payload: scaledX - floor.x,
+          payload: pointX - floor.x,
         });
         dispatch({
           type: ActionType.SET_MOUSE_OFFSET_Y,
-          payload: scaledY - floor.y,
+          payload: pointY - floor.y,
         });
       }
     },
@@ -333,9 +326,7 @@ export const useAreas = () => {
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
     if (svgRef.current) {
-      const rect = svgRef.current.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const { x, y } = toSvgPoint(svgRef.current, event);
       if (toolTypeRef?.current !== toolType.select && toolTypeRef?.current !== toolType.selectFloor) {
         if (toolTypeRef?.current === toolType.scrollSvg && svgContainerRef.current) {
           dispatch({ type: ActionType.SET_START_X, payload: event.clientX });
@@ -421,29 +412,20 @@ export const useAreas = () => {
 
   const handleMouseMove = (event: React.MouseEvent) => {
     event.preventDefault();
-    const scale = 1;
     if (svgRef.current) {
-      const rect = svgRef.current.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const scaledX = x / scale;
-      const scaledY = y / scale;
-      const scaledStartX = startX / scale;
-      const scaledStartY = startY / scale;
+      const { x, y } = toSvgPoint(svgRef.current, event);
       if (dragging) {
         if (toolTypeRef?.current !== toolType.select && toolTypeRef?.current !== toolType.selectFloor) {
           if (tool === toolType.scrollSvg && svgContainerRef.current) {
-            const x = event.clientX / scale;
-            const y = event.clientY / scale;
-            const deltaX = x - scaledStartX;
-            const deltaY = y - scaledStartY;
+            const deltaX = event.clientX - startX;
+            const deltaY = event.clientY - startY;
             svgContainerRef.current.scrollTop = scrollTop - deltaY;
             svgContainerRef.current.scrollLeft = scrollLeft - deltaX;
           } else {
-            const width = scaledX - scaledStartX;
-            const height = scaledY - scaledStartY;
-            const pathX = width < 0 ? scaledX : scaledStartX;
-            const pathY = height < 0 ? scaledY : scaledStartY;
+            const width = x - startX;
+            const height = y - startY;
+            const pathX = width < 0 ? x : startX;
+            const pathY = height < 0 ? y : startY;
             let props: IAreasProperties = {
               x: pathX,
               y: pathY,
@@ -488,8 +470,8 @@ export const useAreas = () => {
         } else {
           if (selectedFloor) {
             createRefActionName.current = "moving";
-            const newX = scaledX - mouseOffsetX;
-            const newY = scaledY - mouseOffsetY;
+            const newX = x - mouseOffsetX;
+            const newY = y - mouseOffsetY;
             const firstLOccurrence = selectedFloor.d?.indexOf("l") || 0;
             const result = selectedFloor.d?.substring(firstLOccurrence);
             const props = {
@@ -515,8 +497,8 @@ export const useAreas = () => {
             if (resizing && resizeCorner === "bottom-right") {
             } else {
               createRefActionName.current = "moving";
-              const newX = scaledX - mouseOffsetX;
-              const newY = scaledY - mouseOffsetY;
+              const newX = x - mouseOffsetX;
+              const newY = y - mouseOffsetY;
               const selected = selectedArea[0].properties;
               const firstLOccurrence = selected.d?.indexOf("l") || 0;
               const result = selected.d?.substring(firstLOccurrence);

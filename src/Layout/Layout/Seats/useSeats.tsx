@@ -31,6 +31,7 @@ import { setAllInOne, setValidations } from "@/store/venueSlice";
 import { type RootState } from "@/store/store";
 import { notify } from "@/lib/notify";
 import { isTypingTarget } from "@/utils/isTypingTarget";
+import { toSvgPoint } from "@/utils/svgPoint";
 import { generateLinesAndSeats } from "@/utils/generateLinesAndSeats";
 
 export const useSeats = () => {
@@ -210,9 +211,7 @@ export const useSeats = () => {
       e.preventDefault();
       if (seatsType === toolType.select_rows && svgRef.current) {
         selectIngSingleRowRef.current = true;
-        const rect = svgRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const { x, y } = toSvgPoint(svgRef.current, e);
 
         isRowSelectedRef.current = true;
         setSelectedRows([selectedRow]);
@@ -237,9 +236,7 @@ export const useSeats = () => {
       e.preventDefault();
 
       if (svgRef.current) {
-        const rect = svgRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const { x, y } = toSvgPoint(svgRef.current, e);
 
         if (seatsType === toolType.select_rows) {
           if (selectedRows.length && multipleSelectedRowsArea && !selectIngSingleRowRef.current) {
@@ -293,7 +290,7 @@ export const useSeats = () => {
           }
 
           selectIngSingleRowRef.current = false;
-          startPositionRef.current = { x: e.clientX, y: e.clientY };
+          startPositionRef.current = { x, y };
           setSelectionRect({
             x: 0,
             y: 0,
@@ -302,7 +299,7 @@ export const useSeats = () => {
           });
           setMultipleSelectArea(true);
         } else if (seatsType === toolType.select_seats) {
-          startPositionRef.current = { x: e.clientX, y: e.clientY };
+          startPositionRef.current = { x, y };
           setSelectionRect({
             x: 0,
             y: 0,
@@ -332,15 +329,11 @@ export const useSeats = () => {
       e.preventDefault();
 
       if (svgRef.current && isDraggingRef.current) {
-        const rect = svgRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const { x, y } = toSvgPoint(svgRef.current, e);
 
         if (seatsType === toolType.scrollSvg && svgContainerRef.current) {
-          const x = e.clientX || e.clientX;
-          const y = e.clientY || e.clientY;
-          const deltaX = x - startPositionRef.current.x;
-          const deltaY = y - startPositionRef.current.y;
+          const deltaX = e.clientX - startPositionRef.current.x;
+          const deltaY = e.clientY - startPositionRef.current.y;
           svgContainerRef.current.scrollTop = scrollPositionRef.current.y - deltaY;
           svgContainerRef.current.scrollLeft = scrollPositionRef.current.x - deltaX;
         } else if (seatsType === toolType.multipleX) {
@@ -356,17 +349,13 @@ export const useSeats = () => {
             seatsRows,
           );
           setTempSeats(newRow || []);
-        } else if (multipleSelectArea && svgContainerRef.current) {
-          const xMin = Math.min(startPositionRef.current.x, e.clientX);
-          const xMax = Math.max(startPositionRef.current.x, e.clientX);
-          const yMin = Math.min(startPositionRef.current.y, e.clientY);
-          const yMax = Math.max(startPositionRef.current.y, e.clientY);
-
+        } else if (multipleSelectArea) {
+          const start = startPositionRef.current;
           setSelectionRect({
-            x: xMin + svgContainerRef.current.scrollLeft,
-            y: yMin + svgContainerRef.current.scrollTop,
-            width: xMax - xMin,
-            height: yMax - yMin,
+            x: Math.min(start.x, x),
+            y: Math.min(start.y, y),
+            width: Math.abs(x - start.x),
+            height: Math.abs(y - start.y),
           });
         }
 
@@ -414,11 +403,13 @@ export const useSeats = () => {
       setXYLines(false);
       setRotatingOutlinedArea(0);
 
-      if (multipleSelectArea && !isRowSelectedRef.current && svgContainerRef.current) {
-        const xMin = Math.min(startPositionRef.current.x, e.clientX) + svgContainerRef.current.scrollLeft;
-        const xMax = Math.max(startPositionRef.current.x, e.clientX) + svgContainerRef.current.scrollLeft;
-        const yMin = Math.min(startPositionRef.current.y, e.clientY) + svgContainerRef.current.scrollTop;
-        const yMax = Math.max(startPositionRef.current.y, e.clientY) + svgContainerRef.current.scrollTop;
+      if (multipleSelectArea && !isRowSelectedRef.current && svgRef.current) {
+        const start = startPositionRef.current;
+        const end = toSvgPoint(svgRef.current, e);
+        const xMin = Math.min(start.x, end.x);
+        const xMax = Math.max(start.x, end.x);
+        const yMin = Math.min(start.y, end.y);
+        const yMax = Math.max(start.y, end.y);
 
         if (seatsType === toolType.select_rows) {
           const arr: IRowData[] = [];

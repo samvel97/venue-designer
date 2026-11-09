@@ -111,29 +111,32 @@ const Seats = () => {
         </>
       }
     >
-      {editor.selectedArea ? (
-        <SeatsSvg
-          ref={svgRef}
-          tempSeats={editor.tempSeats}
-          seatsRows={editor.seatsRows}
-          selectedRows={selectedRows}
-          multipleSelectArea={editor.multipleSelectArea}
-          xyLines={editor.xyLines}
-          multipleSelectedRowsArea={editor.multipleSelectedRowsArea}
-          selectedArea={editor.selectedArea}
-          selectionRect={editor.selectionRect}
-          rotatingOutlinedArea={editor.rotatingOutlinedArea}
-          seatsSpacing={editor.multipleSeatsAndRows.seatSpacing}
-          resize={editor.resize}
-          seatsType={seatsType}
-          pathMouseDown={editor.pathMouseDown}
-          chooseSeats={editor.chooseSeats}
-          handleMouseDown={editor.handleMouseDown}
-          handleMouseMove={editor.handleMouseMove}
-          handleMouseUp={editor.handleMouseUp}
-          getCoordsforResizing={editor.getCoordsforResizing}
-        />
-      ) : null}
+      {(zoom) =>
+        editor.selectedArea ? (
+          <SeatsSvg
+            ref={svgRef}
+            zoom={zoom}
+            tempSeats={editor.tempSeats}
+            seatsRows={editor.seatsRows}
+            selectedRows={selectedRows}
+            multipleSelectArea={editor.multipleSelectArea}
+            xyLines={editor.xyLines}
+            multipleSelectedRowsArea={editor.multipleSelectedRowsArea}
+            selectedArea={editor.selectedArea}
+            selectionRect={editor.selectionRect}
+            rotatingOutlinedArea={editor.rotatingOutlinedArea}
+            seatsSpacing={editor.multipleSeatsAndRows.seatSpacing}
+            resize={editor.resize}
+            seatsType={seatsType}
+            pathMouseDown={editor.pathMouseDown}
+            chooseSeats={editor.chooseSeats}
+            handleMouseDown={editor.handleMouseDown}
+            handleMouseMove={editor.handleMouseMove}
+            handleMouseUp={editor.handleMouseUp}
+            getCoordsforResizing={editor.getCoordsforResizing}
+          />
+        ) : null
+      }
     </EditorLayout>
   );
 };

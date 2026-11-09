@@ -6,8 +6,6 @@ import AreasSidebar from "./components/AreasSidebar";
 import AreasSvg from "./components/AreasSvg/AreasSvg";
 import { useAreas } from "./useAreas";
 
-const CANVAS_SIZE = 20000;
-
 const Areas = () => {
   const { svgRef, svgContainerRef, inputRef, ticketsCountRef, refList, ...editor } = useAreas();
   const venueId = editor.venueId ?? "";
@@ -45,25 +43,26 @@ const Areas = () => {
       canvasRef={svgContainerRef}
       panning={editor.tool === toolType.scrollSvg}
     >
-      <AreasSvg
-        ref={svgRef}
-        areas={editor.areas}
-        selectedArea={editor.selectedArea}
-        resizeCursor={editor.resizeCursor}
-        tempShape={editor.tempShape}
-        floorProperties={editor.floorProperties}
-        selectedFloor={editor.selectedFloor}
-        sectionConTentView={editor.sectionConTentView}
-        layoutView={editor.layoutView}
-        handleSetFocused={editor.handleSetFocused}
-        handleMouseDown={editor.handleMouseDown}
-        handleMouseMove={editor.handleMouseMove}
-        handleMouseUp={editor.handleMouseUp}
-        handleSelectArea={editor.handleSelectArea}
-        handleSelectFloor={editor.handleSelectFloor}
-        width={CANVAS_SIZE}
-        height={CANVAS_SIZE}
-      />
+      {(zoom) => (
+        <AreasSvg
+          ref={svgRef}
+          areas={editor.areas}
+          selectedArea={editor.selectedArea}
+          resizeCursor={editor.resizeCursor}
+          tempShape={editor.tempShape}
+          floorProperties={editor.floorProperties}
+          selectedFloor={editor.selectedFloor}
+          sectionConTentView={editor.sectionConTentView}
+          layoutView={editor.layoutView}
+          handleSetFocused={editor.handleSetFocused}
+          handleMouseDown={editor.handleMouseDown}
+          handleMouseMove={editor.handleMouseMove}
+          handleMouseUp={editor.handleMouseUp}
+          handleSelectArea={editor.handleSelectArea}
+          handleSelectFloor={editor.handleSelectFloor}
+          zoom={zoom}
+        />
+      )}
     </EditorLayout>
   );
 };

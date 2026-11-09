@@ -1,5 +1,5 @@
 import { memo, type MouseEvent, type Ref } from "react";
-import Grid from "@/components/canvas/Grid";
+import Grid, { CANVAS_SIZE } from "@/components/canvas/Grid";
 import type { SvgElementType } from "@/types/types";
 import type { FloorPropTypes, IAreaData, ILayoutView } from "../../types/areasTypes";
 import FloorsPlan from "./FloorsPlan/FloorsPlan";
@@ -13,8 +13,7 @@ interface AreasSvgProps {
   selectedArea: IAreaData[];
   tempShape: IAreaData[];
   resizeCursor: boolean;
-  width: number;
-  height: number;
+  zoom: number;
   floorProperties: FloorPropTypes;
   selectedFloor: FloorPropTypes;
   sectionConTentView: boolean;
@@ -23,8 +22,8 @@ interface AreasSvgProps {
   handleMouseDown: (e: MouseEvent) => void;
   handleMouseMove: (e: MouseEvent) => void;
   handleMouseUp: (e: MouseEvent) => void;
-  handleSelectArea: (e: MouseEvent, area: IAreaData, scale: number) => void;
-  handleSelectFloor: (e: MouseEvent, floor: FloorPropTypes, scale: number) => void;
+  handleSelectArea: (e: MouseEvent, area: IAreaData) => void;
+  handleSelectFloor: (e: MouseEvent, floor: FloorPropTypes) => void;
 }
 
 const AreasSvg = ({
@@ -33,8 +32,7 @@ const AreasSvg = ({
   selectedArea,
   tempShape,
   resizeCursor,
-  width,
-  height,
+  zoom,
   floorProperties,
   selectedFloor,
   sectionConTentView,
@@ -51,9 +49,9 @@ const AreasSvg = ({
     tabIndex={0}
     ref={ref}
     className="block bg-white outline-none"
-    width={width}
-    height={height}
-    viewBox={`0 0 ${width} ${height}`}
+    width={CANVAS_SIZE * zoom}
+    height={CANVAS_SIZE * zoom}
+    viewBox={`0 0 ${CANVAS_SIZE} ${CANVAS_SIZE}`}
     onMouseDown={handleMouseDown}
     onMouseMove={handleMouseMove}
     onMouseUp={handleMouseUp}
@@ -62,11 +60,7 @@ const AreasSvg = ({
   >
     <Grid />
     {layoutView?.properties ? <LayoutView floorProperties={layoutView.properties} /> : null}
-    <FloorsPlan
-      floorProperties={floorProperties}
-      selectedFloor={selectedFloor}
-      handleSelectFloor={(e, floor) => handleSelectFloor(e, floor, 1)}
-    />
+    <FloorsPlan floorProperties={floorProperties} selectedFloor={selectedFloor} handleSelectFloor={handleSelectFloor} />
     {areas.map((area) => (
       <Shapes
         key={area.localId}
@@ -74,7 +68,7 @@ const AreasSvg = ({
         selectedArea={selectedArea}
         resizeCursor={resizeCursor}
         sectionConTentView={sectionConTentView}
-        handleSelectArea={(e, selected) => handleSelectArea(e, selected, 1)}
+        handleSelectArea={handleSelectArea}
       />
     ))}
     {tempShape.map((area) => (
