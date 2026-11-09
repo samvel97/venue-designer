@@ -1,0 +1,20 @@
+@import "src/assets/style/variables";
+.P-switcher-container{
+    margin-bottom: 24px;
+    .P-switch-to-areas{
+        font-size: $font-size-18;
+        box-shadow: none;
+        color: black;
+        width: auto;
+        margin-bottom: 24px;
+        &:hover{
+            border: none;
+        }
+    }
+    .switch-button {
+        color: black;
+        text-transform: capitalize;
+        font-size: $font-size-18;
+        box-shadow: none;
+    }
+}

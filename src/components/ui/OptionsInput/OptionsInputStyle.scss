@@ -1,0 +1,49 @@
+@import "src/assets/style/variables";
+.P-options-input-item{
+    border: 1px solid $grey-70;
+    border-radius: $radius4;
+    padding: 4px 16px;
+    &:hover{
+        background-color: #FCFCFC;
+        border: 1px solid #E6E6E6;
+    }
+    &.P-height-margin{
+        margin-bottom: 32px;
+    }
+    &.P-items-margin{
+        margin-bottom: 16px;
+    }
+    .P-rotate-svg{
+        font-size: 24px;
+        margin-right: 4px;
+        height: 24px;
+    }
+    .P-label{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: "nowrap",
+    }
+    &:last-child{
+        margin-bottom: 0;
+    }
+    &:focus-within{
+        border: 1px solid $green-100;
+        background-color: #FCFCFC;
+    }
+    
+}
+.G-input  {
+    label {
+        input {
+        &.P-options-input {
+            background-color: rgba(0,0,0,0);
+            border: none ;
+            height: 24px ;
+            }
+        }
+        input::placeholder {
+            color: gray;
+        }
+    }
+
+}

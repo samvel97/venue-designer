@@ -1,0 +1,13 @@
+.P-groups-component{
+    width: 100%;
+    margin-bottom: 24px;
+    .P-Item-wrapper{
+        padding-right: 16px;
+        &:last-child{
+            padding-right: 0px;
+        }
+    }
+    &.P-group-padding {
+        margin: 24px 0; 
+    }
+}

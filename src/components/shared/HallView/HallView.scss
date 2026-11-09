@@ -1,0 +1,44 @@
+@import "src/assets/style/variables";
+.P-hall-view-container{
+    font-size: 500px;
+    position: relative;
+    .P-container{
+        width: 100%;
+        height: 100%;
+        box-shadow: $button-shadow;
+        border-radius: $radius8;
+        user-select: none;
+
+        .P-hall-floors{
+            width: 270px;
+            padding: 40px 50px 20px 50px;
+            background-color: white;
+            border-top-right-radius: $radius8 ;
+            border-bottom-right-radius: $radius8;
+        }
+        .P-svg-wrapper {
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+            .P-svg{
+                display: block;
+                margin: auto;
+                background-color: $white;
+                border-top-left-radius:$radius8;
+                border-bottom-left-radius:$radius8;
+                transform-box: view-box;
+                transform-origin: center center;
+            }
+        }
+    }
+    .P-loading{
+        position: absolute;
+        font-size: 16px;
+        width: 80%;
+        top:0;
+        height: 450px;
+    }
+    
+   
+}
+

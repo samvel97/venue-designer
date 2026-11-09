@@ -1,0 +1,25 @@
+.P-Floor-button-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .P-button-item{
+        width: 170px;
+        &:hover .P-view-icon{
+            display: flex;
+            justify-content: end;
+        }
+    }
+    .P-view-icon{
+        position: absolute;
+        width: 170px;
+        height: 36px;
+        transform: translate(-15px, -26px);
+        z-index:1;
+        display: none;
+        cursor: pointer;
+        .P-view{
+            width: fit-content;
+        }
+    }
+    
+}

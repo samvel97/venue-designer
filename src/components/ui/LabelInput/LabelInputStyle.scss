@@ -1,0 +1,32 @@
+@import "src/assets/style/variables";
+
+.P-permission-input{
+ margin-bottom: 24px;
+ width: 100%;
+ height: auto;
+ .P-Input{
+   .MuiInputLabel-root {
+      color:black
+    }
+ .MuiInputLabel-root.Mui-focused {
+   color:black
+    }
+    
+ .MuiInputLabel-root.Mui-error {
+   color:black
+    }
+ .MuiOutlinedInput-root {
+   &.Mui-focused .MuiOutlinedInput-notchedOutline {
+     border-color: $primary-green-110; /* Change this to your desi$primary-green-110 color */
+     color:$primary-green-110
+   }
+   &:hover .MuiOutlinedInput-notchedOutline {
+     border-color: $primary-green-110; /* Change this to your desired color */
+     color:$primary-green-110
+   }
+   .MuiOutlinedInput-notchedOutline {
+     border-color: $primary-green-110; /* Change this to your desired color */
+     color:$primary-green-110
+   }
+ }
+}}

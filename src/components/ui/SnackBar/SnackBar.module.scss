@@ -1,0 +1,23 @@
+.snackContent {
+  // background-color: hsl(0, 0%, 96%, 1);
+  font-size: 18px;
+  border-radius: 4px;
+  padding: 20px;
+  // color: #080808;
+  display: flex;
+  align-items: center;
+  max-width: 700px;
+  line-height: 48px;
+  font-weight: 400;
+  gap: 16px;
+  border-left: 3px solid hsl(152, 82%, 39%);
+
+
+  img {
+    margin-right: 16px;
+  }
+}
+
+.error {
+  border-left: 3px solid hsl(4, 86%, 58%);
+}

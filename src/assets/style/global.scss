@@ -1,0 +1,118 @@
+@import "./variables";
+@import "./mixin";
+@import "./font";
+
+
+
+.G-pointer {
+  cursor : pointer;
+}
+
+::-webkit-scrollbar {
+  width            : 5px;
+  height           : 5px;
+  background-color : white;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background    : #d1d1d1;
+  border-radius : 20px;
+}
+
+.G-shadow{
+  -webkit-box-shadow : 2px 3px 4px 0 #ebe7e7;
+  box-shadow         : 2px 3px 4px 0 #ebe7e7;
+}
+
+.G-shadow-dark{
+  -webkit-box-shadow : 2px 3px 4px 0 #c2bfbf;
+  box-shadow         : 2px 3px 4px 0 #c2bfbf;
+}
+
+.G-shadow-around{
+  -webkit-box-shadow: 2px 0px 18px 2px rgba(204,200,200,0.56); 
+  box-shadow: 2px 0px 18px 2px rgba(204,200,200,0.56);
+}
+
+.G-hidden {
+  overflow : hidden;
+}
+
+.G-container {
+  max-width : 991px;
+  width     : 100%;
+  padding   : 0 30px;
+  margin    : 0 auto;
+  @include screen-max-width-576{
+    padding   : 0 15px;
+  }
+}
+
+.G-close-button {
+  position   : relative;
+  width      : 40px;
+  height     : 40px;
+  cursor     : pointer;
+  transform  : rotate(45deg);
+  transition : 0.3s;
+
+  &::before {
+    content          : "";
+    width            : 30px;
+    height           : 1px;
+    background-color : $grey-60;
+    display          : block;
+    position         : absolute;
+    left             : 50%;
+    top              : 50%;
+    transform        : translate(-50%, -50%);
+    transition       : $transition;
+  }
+;
+
+  &::after {
+    content          : "";
+    width            : 30px;
+    height           : 1px;
+    background-color : $grey-60;
+    display          : block;
+    position         : absolute;
+    left             : 50%;
+    top              : 50%;
+    transition       : $transition;
+    transform        : translate(-50%, -50%) rotate(90deg);
+  }
+}
+
+
+.G-padding-33 {
+  width   : 33.33%;
+  padding : 10px 25px;
+}
+
+.G-padding-50 {
+  width   : 50%;
+  padding : 10px 25px;
+}
+.G-bg-contain{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.G-bg-cover{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.G-block-container{
+    max-width: 100%;
+    background-color: white;
+    min-height: 100vh;
+    border-radius: 45px 45px 0 0;
+    @include screen-max-width-450{
+      border-radius: 25px 25px 0 0;
+    }
+
+}
+
