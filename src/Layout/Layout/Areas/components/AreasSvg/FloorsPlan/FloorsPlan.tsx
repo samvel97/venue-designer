@@ -1,24 +1,15 @@
 import { memo } from "react";
-import { FloorPropTypes } from "../../../types/areasTypes";
-import {
-  backgroundColor,
-  outlineColor,
-  ShapeType,
-  strokeColor,
-} from "../../../constants/areasConstants";
-import SvgPathElement from "components/ui/SvgPathElement/SvgPathElement";
-import SvgEllipseElement from "components/ui/SvgEllipseElement/SvgEllipseElement";
-import { toolType } from "types/types";
+import { type FloorPropTypes } from "../../../types/areasTypes";
+import { backgroundColor, outlineColor, ShapeType, strokeColor } from "../../../constants/areasConstants";
+import SvgPathElement from "@/components/canvas/SvgPathElement";
+import SvgEllipseElement from "@/components/canvas/SvgEllipseElement";
+import { toolType } from "@/types/types";
 type Props = {
   floorProperties: FloorPropTypes;
   selectedFloor: FloorPropTypes;
   handleSelectFloor: (e: React.MouseEvent, floor: FloorPropTypes) => void;
 };
-const WrappedFloorPlan = ({
-  floorProperties,
-  selectedFloor,
-  handleSelectFloor,
-}: Props) => {
+const WrappedFloorPlan = ({ floorProperties, selectedFloor, handleSelectFloor }: Props) => {
   const backgroundShape = {
     [toolType.rectangle]: (
       <SvgPathElement
@@ -57,11 +48,7 @@ const WrappedFloorPlan = ({
       />
     ),
   };
-  return (
-    <>
-      {backgroundShape[floorProperties?.type as keyof typeof backgroundShape]}
-    </>
-  );
+  return <>{backgroundShape[floorProperties?.type as keyof typeof backgroundShape]}</>;
 };
 const FloorsPlan = memo(WrappedFloorPlan);
 export default FloorsPlan;

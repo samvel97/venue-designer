@@ -1,15 +1,11 @@
-import SvgEllipseElement from "components/ui/SvgEllipseElement/SvgEllipseElement";
-import SvgPathElement from "components/ui/SvgPathElement/SvgPathElement";
-import {
-  backgroundColor,
-  outlineColor,
-  strokeColor,
-} from "Layout/Layout/Areas/constants/areasConstants";
-import { IAreaData } from "Layout/Layout/Areas/types/areasTypes";
-import { IRowData } from "Layout/Layout/Seats/types/seatsTypes";
+import SvgEllipseElement from "@/components/canvas/SvgEllipseElement";
+import SvgPathElement from "@/components/canvas/SvgPathElement";
+import { backgroundColor, outlineColor, strokeColor } from "@/Layout/Layout/Areas/constants/areasConstants";
+import { type IAreaData } from "@/Layout/Layout/Areas/types/areasTypes";
+import { type IRowData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { memo } from "react";
-import { toolType } from "types/types";
-import { getLSData } from "utils/getLsData";
+import { toolType } from "@/types/types";
+import { areaTitle } from "@/utils/areaTitle";
 interface IShapes {
   area: IAreaData;
   selectedArea: IAreaData[];
@@ -17,14 +13,7 @@ interface IShapes {
   sectionConTentView: boolean;
   handleSelectArea: (e: React.MouseEvent, area: IAreaData) => void;
 }
-const Shapes = ({
-  area,
-  selectedArea,
-  resizeCursor,
-  sectionConTentView,
-  handleSelectArea,
-}: IShapes) => {
-  const lang = getLSData("locale");
+const Shapes = ({ area, selectedArea, sectionConTentView, handleSelectArea }: IShapes) => {
   const drawingShape = () => {
     switch (area.properties.type) {
       case toolType.ellipse:
@@ -33,15 +22,13 @@ const Shapes = ({
             id={`area-${area.localId}`}
             area={area}
             properties={area.properties}
-            title={area.title[lang! as keyof typeof area.title]}
+            title={areaTitle(area.title)}
             handleSelectShape={handleSelectArea}
             fill={backgroundColor[area.areaType]}
             stroke={strokeColor[area.areaType]}
             style={{
               cursor: selectedArea[0] === area ? "move" : "",
-              outline: selectedArea.some(
-                (selectedRow: IAreaData) => selectedRow.localId === area.localId
-              )
+              outline: selectedArea.some((selectedRow: IAreaData) => selectedRow.localId === area.localId)
                 ? outlineColor
                 : "",
             }}
@@ -54,15 +41,13 @@ const Shapes = ({
             id={`area-${area.localId}`}
             area={area}
             properties={area.properties}
-            title={area.title[lang! as keyof typeof area.title]}
+            title={areaTitle(area.title)}
             handleSelectShape={handleSelectArea}
             fill={backgroundColor[area.areaType]}
             stroke={strokeColor[area.areaType]}
             style={{
               cursor: selectedArea[0] === area ? "move" : "",
-              outline: selectedArea.some(
-                (selectedRow: IAreaData) => selectedRow.localId === area.localId
-              )
+              outline: selectedArea.some((selectedRow: IAreaData) => selectedRow.localId === area.localId)
                 ? outlineColor
                 : "",
             }}

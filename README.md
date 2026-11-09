@@ -1,7 +1,7 @@
 # Venue Designer
 
 An SVG editor for building venue layouts: floors, areas and seat maps for theatres, concert halls and stadiums.
-Built with **React 18, TypeScript, Redux Toolkit / RTK Query and plain SVG** (no canvas libraries).
+Built with **React 19, TypeScript, Redux Toolkit / RTK Query, Tailwind CSS v4, Radix UI and plain SVG** (no canvas libraries).
 
 **Live demo:** https://samvel97.github.io/venue-designer/
 
@@ -33,20 +33,26 @@ To connect a real server, replace `localBaseQuery` in `src/store/baseQuery.ts` w
 src/
   Layout/Layout/Areas/   floor + area editor (useAreas hook, reducer, SVG shapes)
   Layout/Layout/Seats/   seat editor (row generation, curving, numbering)
-  components/shared/     HallView preview of the whole venue
-  store/                 Redux slices, RTK Query API, local backend
+  components/primitives/ Radix + Tailwind UI primitives (button, dialog, switch, ...)
+  components/editor/     editor chrome: header, floors panel, inspector fields
+  components/canvas/     shared SVG shape renderers
+  components/shared/     HallView preview of the whole venue, error boundary
+  store/                 Redux slice, RTK Query API, local backend
   utils/                 geometry: rotation, bounding boxes, curved rows, validation
 ```
 
 ## Getting started
 
 ```bash
-npm install
-npm start        # http://localhost:3000
-npm run build    # production build in /build
+npm install      # Node 22.22+
+npm run dev      # http://localhost:5173
+npm run build    # type-check + production build in /build
+npm test         # Vitest
+npm run lint     # ESLint (flat config)
+npm run format   # Prettier
 ```
 
-Optional: set `REACT_APP_HOME_URL` to embed the editor in a host application; "Back" will then return there.
+Optional: set `VITE_HOME_URL` to embed the editor in a host application; "Back" will then return there.
 
 ## Background
 

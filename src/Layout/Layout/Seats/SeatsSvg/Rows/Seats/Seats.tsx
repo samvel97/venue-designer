@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { IRowData, ISeatsData } from "../../../types/seatsTypes";
-import { seatRadius } from "Layout/Layout/Seats/constants/seatsConstants";
+import { type IRowData, type ISeatsData } from "../../../types/seatsTypes";
+import { seatRadius } from "@/Layout/Layout/Seats/constants/seatsConstants";
 
 interface ISeatsComponent {
   seat: ISeatsData;
@@ -10,13 +10,7 @@ interface ISeatsComponent {
   seatMouseDown: (e: React.MouseEvent, row: IRowData) => void;
   chooseSeats: (seats: ISeatsData) => void;
 }
-const Seats = ({
-  seat,
-  selectedRows,
-  row,
-  resize,
-  seatMouseDown,
-}: ISeatsComponent) => {
+const Seats = ({ seat, selectedRows, row, resize, seatMouseDown }: ISeatsComponent) => {
   const { x, y, width, height } = seat.properties;
 
   return (
@@ -27,9 +21,7 @@ const Seats = ({
         cy={y}
         r={seatRadius}
         fill={
-          selectedRows.some(
-            (selectedRow) => selectedRow.localId === row.localId
-          ) && resize
+          selectedRows.some((selectedRow) => selectedRow.localId === row.localId) && resize
             ? "rgba(101, 106, 129,0.3)"
             : "rgba(101, 106, 129,1)"
         }
@@ -38,11 +30,7 @@ const Seats = ({
         strokeLinejoin={"round"}
         opacity={1}
         style={{
-          cursor: selectedRows.some(
-            (selectedRow) => selectedRow.localId === row.localId
-          )
-            ? "move"
-            : "default",
+          cursor: selectedRows.some((selectedRow) => selectedRow.localId === row.localId) ? "move" : "default",
         }}
       />
       <text
@@ -52,20 +40,14 @@ const Seats = ({
         textAnchor="middle"
         alignmentBaseline="middle"
         fill="white"
-        transform={`rotate(${row.properties.rotate} ${x + width / 2 - 12} ${
-          y + height / 2 - 12.5
-        })`}
+        transform={`rotate(${row.properties.rotate} ${x + width / 2 - 12} ${y + height / 2 - 12.5})`}
         style={{
           color: "black",
           fontFamily: "Segoe UI",
           fontSize: seat.seatOrder > 99 ? 8 : 10,
           fontStyle: "normal",
           fontWeight: 400,
-          cursor: selectedRows.some(
-            (selectedRow) => selectedRow.localId === row.localId
-          )
-            ? "move"
-            : "default",
+          cursor: selectedRows.some((selectedRow) => selectedRow.localId === row.localId) ? "move" : "default",
         }}
       >
         {seat.seatOrder}

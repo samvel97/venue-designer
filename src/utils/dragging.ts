@@ -1,11 +1,8 @@
-import { IRowData, ISeatsData } from "Layout/Layout/Seats/types/seatsTypes";
+import { type IRowData, type ISeatsData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { curveRow } from "./curveRow";
 import { selectedItemsOutlinedArea } from "./selectedRowsOutlinedArea";
-import {
-  calculateRowSeatsMaxCoords,
-  calculatingSelectedRowsMInCoords,
-} from "./calculatingSelectedRowsMInCoords";
-import { IStandardProperties } from "types/types";
+import { calculateRowSeatsMaxCoords, calculatingSelectedRowsMInCoords } from "./calculatingSelectedRowsMInCoords";
+import { type Coords, type IStandardProperties } from "@/types/types";
 import { getStoredNumberingMode, isContinuousNumbering } from "./seatNumbering";
 
 export const createSeats = (
@@ -17,7 +14,7 @@ export const createSeats = (
   seatSpacing: number,
   nextId: number,
   selectedAreaId: string | undefined,
-  seatsRows: IRowData[]
+  seatsRows: IRowData[],
 ) => {
   const width = x - startX;
   const spacing = Math.abs(+seatSpacing);
@@ -30,9 +27,7 @@ export const createSeats = (
       const myX = startX + (width < 0 ? -1 : 1) * (index * spacing);
       const myY = startY + seatRadius;
       const seatOrder = byOrder
-        ? index +
-          (seatsRows?.[seatsRows.length - 1]?.seats?.at(-1)?.seatOrder ?? 0) +
-          1
+        ? index + (seatsRows?.[seatsRows.length - 1]?.seats?.at(-1)?.seatOrder ?? 0) + 1
         : index + 1;
       return {
         localId: index,
@@ -64,11 +59,7 @@ export const createSeats = (
   }
 };
 
-export const resizingRow = (
-  x: number,
-  seatWidth: number,
-  selectedRows: IRowData[]
-) => {
+export const resizingRow = (x: number, seatWidth: number, selectedRows: IRowData[]) => {
   const byOrder = isContinuousNumbering(getStoredNumberingMode());
 
   let currentSeatOrder = 1;
@@ -120,13 +111,7 @@ export const resizingRow = (
   return { updatedRows, selectedRowsOutlinedArea };
 };
 
-export const rowRotation = (
-  x: number,
-  y: number,
-  multY: number,
-  height: number,
-  rotationInitialX: any
-) => {
+export const rowRotation = (x: number, y: number, multY: number, height: number, rotationInitialX: Coords) => {
   const r = multY + height / 2 - rotationInitialX.y;
   const b = x - rotationInitialX.x;
   let rotation;
@@ -147,16 +132,9 @@ export const rowRotation = (
   return rotation;
 };
 
-export const rowsMoving = (
-  newX: number,
-  newY: number,
-  selectedRows: IRowData[]
-) => {
-  const { x: minX, y: minY } = calculatingSelectedRowsMInCoords(
-    selectedRows,
-    true
-  );
-  let updatedRows: IRowData[] = selectedRows.map((row) => {
+export const rowsMoving = (newX: number, newY: number, selectedRows: IRowData[]) => {
+  const { x: minX, y: minY } = calculatingSelectedRowsMInCoords(selectedRows, true);
+  const updatedRows: IRowData[] = selectedRows.map((row) => {
     const updatedSeats = row.seats.map((seat: ISeatsData) => {
       const myX = newX - (minX - seat.properties.x);
       const myY = newY - (minY - seat.properties.y);
@@ -184,12 +162,11 @@ const compare = (a: number, b1: number, b2: number) =>
 export const handleSameCoordinates = (
   rows: IRowData[],
   selectedRows: IRowData[],
-  selectedRowsArea: IStandardProperties
+  selectedRowsArea: IStandardProperties,
 ) => {
   const { height, width, x, y } = selectedRowsArea;
   const notSelectedRows = rows.filter(
-    (row) =>
-      !selectedRows.some((selectedRow) => row.localId === selectedRow.localId)
+    (row) => !selectedRows.some((selectedRow) => row.localId === selectedRow.localId),
   );
 
   const coords = {

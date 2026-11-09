@@ -1,4 +1,4 @@
-import { IRowData } from "Layout/Layout/Seats/types/seatsTypes";
+import { type IRowData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { memo } from "react";
 
 interface IRowTitle {
@@ -7,9 +7,7 @@ interface IRowTitle {
   order: number | string;
 }
 const RowTitle = ({ row, rotate, order }: IRowTitle) => {
-  const leftToRight =
-    row?.seats.length > 1 &&
-    row?.seats[0]?.properties?.x < row.seats[1]?.properties?.x;
+  const leftToRight = row?.seats.length > 1 && row?.seats[0]?.properties?.x < row.seats[1]?.properties?.x;
 
   return (
     <text

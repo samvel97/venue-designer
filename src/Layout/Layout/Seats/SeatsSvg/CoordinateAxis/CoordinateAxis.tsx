@@ -1,7 +1,7 @@
 import { memo } from "react";
-import { IRowData } from "../../types/seatsTypes";
-import { IStandardProperties } from "types/types";
-import { handleSameCoordinates } from "utils/dragging";
+import { type IRowData } from "../../types/seatsTypes";
+import { type IStandardProperties } from "@/types/types";
+import { handleSameCoordinates } from "@/utils/dragging";
 
 interface ICoordinateAxis {
   rotatingOutlinedArea: number;
@@ -16,11 +16,7 @@ const CoordinateAxis = ({
   multipleSelectedRowsArea,
 }: ICoordinateAxis) => {
   const { x, y, width, height } = multipleSelectedRowsArea;
-  const { left, top, bottom, right } = handleSameCoordinates(
-    seatsRows,
-    selectedRows,
-    multipleSelectedRowsArea
-  );
+  const { left, top, bottom, right } = handleSameCoordinates(seatsRows, selectedRows, multipleSelectedRowsArea);
   return (
     <>
       <line
@@ -30,9 +26,7 @@ const CoordinateAxis = ({
         x2={20000}
         y2={y}
         strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
       />
       <line
         stroke={left ? "green" : "silver"}
@@ -41,9 +35,7 @@ const CoordinateAxis = ({
         x2={x}
         y2={20000}
         strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
       />
       <line
         stroke={bottom ? "green" : "silver"}
@@ -52,9 +44,7 @@ const CoordinateAxis = ({
         x2={20000}
         y2={y + height}
         strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
       />
       <line
         stroke={right ? "green" : "silver"}
@@ -63,9 +53,7 @@ const CoordinateAxis = ({
         x2={x + width}
         y2={20000}
         strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
       />
     </>
   );

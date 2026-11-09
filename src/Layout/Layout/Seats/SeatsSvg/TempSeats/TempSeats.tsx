@@ -1,9 +1,9 @@
 import { Fragment, memo } from "react";
-import { IRowData, ISeatsData, TActionType } from "../../types/seatsTypes";
+import { type IRowData, type ISeatsData, type TActionType } from "../../types/seatsTypes";
 import { seatRadius } from "../../constants/seatsConstants";
-import { IStandardProperties } from "types/types";
+import { type IStandardProperties } from "@/types/types";
 import ResizePoints from "../Rows/ResizePoints/ResizePoints";
-import { hasRotatedItem } from "utils/hasRotatedRow";
+import { hasRotatedItem } from "@/utils/hasRotatedRow";
 interface ITempSeats {
   tempSeats: IRowData[];
   seatsSpacing: number;
@@ -15,7 +15,6 @@ interface ITempSeats {
 }
 const TempSeats = ({
   tempSeats,
-  seatsSpacing,
   multipleSelectedRowsArea,
   rotatingOutlinedArea,
   resize,
@@ -29,9 +28,7 @@ const TempSeats = ({
         const length = row.seats.length;
         const initX = (row?.seats?.[0]?.properties?.x ?? 0) - 8;
         const initY = (row?.seats?.[0]?.properties?.y ?? 0) - 8;
-        const spacing =
-          -(row?.seats?.[0]?.properties?.x - row?.seats?.[1]?.properties?.x) ||
-          18;
+        const spacing = -(row?.seats?.[0]?.properties?.x - row?.seats?.[1]?.properties?.x) || 18;
 
         return (
           <Fragment key={row.localId}>
@@ -44,12 +41,8 @@ const TempSeats = ({
                 transform={
                   multipleSelectedRowsArea
                     ? `rotate(${rotatingOutlinedArea}, ${
-                        multipleSelectedRowsArea.x +
-                        multipleSelectedRowsArea.width / 2
-                      }, ${
-                        multipleSelectedRowsArea.y +
-                        multipleSelectedRowsArea.height / 2
-                      })`
+                        multipleSelectedRowsArea.x + multipleSelectedRowsArea.width / 2
+                      }, ${multipleSelectedRowsArea.y + multipleSelectedRowsArea.height / 2})`
                     : ""
                 }
                 fill={"#A0A5BC"}
@@ -60,12 +53,7 @@ const TempSeats = ({
             ))}
             {resize === "resizeX" || seatsType === "multipleX" ? (
               <>
-                <rect
-                  x={initX + (spacing * length - spacing) / 2}
-                  y={initY}
-                  width={30}
-                  height={16}
-                />
+                <rect x={initX + (spacing * length - spacing) / 2} y={initY} width={30} height={16} />
                 <text
                   x={initX + (spacing * length - spacing) / 2 + 15}
                   y={initY + 8.5}
@@ -84,10 +72,7 @@ const TempSeats = ({
                 </text>
                 {!hasRotatedItem(tempSeats) && (
                   <>
-                    <ResizePoints
-                      row={row}
-                      getCoordsforResizing={getCoordsforResizing}
-                    />
+                    <ResizePoints row={row} getCoordsforResizing={getCoordsforResizing} />
                   </>
                 )}
               </>

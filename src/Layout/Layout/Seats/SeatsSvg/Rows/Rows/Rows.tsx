@@ -1,4 +1,4 @@
-import { IRowData } from "Layout/Layout/Seats/types/seatsTypes";
+import { type IRowData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { memo } from "react";
 interface IRowComponent {
   row: IRowData;

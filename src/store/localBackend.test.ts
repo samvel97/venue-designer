@@ -1,4 +1,5 @@
-import { binaryToText, textToBinary } from "utils";
+import { beforeEach, describe, expect, it } from "vitest";
+import { binaryToText, textToBinary } from "@/utils";
 import { exportVenue, handleLocalRequest, importVenue } from "./localBackend";
 
 const layout = (floor: number) => ({ floor, properties: {}, areas: [] });

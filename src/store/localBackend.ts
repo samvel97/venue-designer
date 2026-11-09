@@ -1,4 +1,4 @@
-import { binaryToText, textToBinary } from "utils";
+import { binaryToText, textToBinary } from "@/utils";
 
 /**
  * A tiny in-browser backend that persists venues to localStorage.
@@ -22,9 +22,7 @@ export interface LocalRequest {
   body?: { compressedAreas?: string };
 }
 
-export type LocalResponse =
-  | { data: unknown }
-  | { error: { status: number; data: { message: string } } };
+export type LocalResponse = { data: unknown } | { error: { status: number; data: { message: string } } };
 
 const STORAGE_PREFIX = "venue-designer:venue:";
 
@@ -54,7 +52,6 @@ export const handleLocalRequest = (request: LocalRequest): LocalResponse => {
   if (!venueId) return notFound("venue_id_required");
   const layouts = readVenue(venueId);
 
-  // GET venues/:id/floors/:floor -> single floor
   if (method === "GET" && resource === "floors" && floorParam) {
     const floor = Number(floorParam);
     const layout = layouts.find((item) => item.floor === floor);
@@ -67,7 +64,6 @@ export const handleLocalRequest = (request: LocalRequest): LocalResponse => {
     };
   }
 
-  // GET venues/:id/floors -> all floors
   if (method === "GET" && resource === "floors") {
     return {
       data: {
@@ -78,7 +74,6 @@ export const handleLocalRequest = (request: LocalRequest): LocalResponse => {
     };
   }
 
-  // PUT venues/:id/floors -> create or replace one floor
   if (method === "PUT" && resource === "floors") {
     const compressed = request.body?.compressedAreas;
     if (!compressed) return notFound("layout_required");
@@ -90,13 +85,11 @@ export const handleLocalRequest = (request: LocalRequest): LocalResponse => {
     return { data: { message: "Ok" } };
   }
 
-  // DELETE venues/:id/floors/last -> remove the top floor
   if (method === "DELETE" && resource === "floors") {
     writeVenue(venueId, layouts.slice(0, -1));
     return { data: { message: "Ok" } };
   }
 
-  // POST venues/:id/publish -> nothing to publish locally
   if (method === "POST" && resource === "publish") {
     return { data: null };
   }

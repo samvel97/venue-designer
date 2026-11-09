@@ -1,14 +1,11 @@
-import {
-  localStorageRowsKey,
-  RowTypeEnums,
-} from "Layout/Layout/Seats/constants/seatsConstants";
-import { IRowData } from "Layout/Layout/Seats/types/seatsTypes";
+import { beforeEach, describe, expect, it } from "vitest";
+import { localStorageRowsKey, RowTypeEnums } from "@/Layout/Layout/Seats/constants/seatsConstants";
+import { type IRowData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { createSeats } from "./dragging";
 import { AREA_ORIGIN, generateLinesAndSeats } from "./generateLinesAndSeats";
 import { getStoredNumberingMode, isContinuousNumbering } from "./seatNumbering";
 
-const seatOrders = (rows: IRowData[]) =>
-  rows.map((row) => row.seats.map((seat) => seat.seatOrder));
+const seatOrders = (rows: IRowData[]) => rows.map((row) => row.seats.map((seat) => seat.seatOrder));
 
 const generate = (rowByOrder: RowTypeEnums, seatsRows: IRowData[] = []) =>
   generateLinesAndSeats({
@@ -73,8 +70,7 @@ describe("generateLinesAndSeats", () => {
 });
 
 describe("generateLinesAndSeats placement", () => {
-  const seatYs = (rows: IRowData[]) =>
-    rows.flatMap((row) => row.seats.map((seat) => seat.properties.y));
+  const seatYs = (rows: IRowData[]) => rows.flatMap((row) => row.seats.map((seat) => seat.properties.y));
 
   it("places the first block at the area's top-left corner", () => {
     const rows = generate(RowTypeEnums.START_AT_ONE);
@@ -87,7 +83,6 @@ describe("generateLinesAndSeats placement", () => {
     const next = generate(RowTypeEnums.START_AT_ONE, existing);
     const existingBottom = Math.max(...seatYs(existing));
     const nextTop = Math.min(...seatYs(next));
-    // One empty row (18px pitch) between the blocks.
     expect(nextTop - existingBottom).toBe(2 * 18);
   });
 

@@ -3,7 +3,7 @@
  * When set, "Back" and "Save & continue" return there; otherwise the editor
  * stays standalone and returns to its own start page.
  */
-export const HOME_URL = process.env.REACT_APP_HOME_URL || "";
+const HOME_URL = import.meta.env.VITE_HOME_URL || "";
 
 export const DEFAULT_VENUE_ID = "demo";
 

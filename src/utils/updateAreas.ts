@@ -1,8 +1,5 @@
-import {
-  FloorPropTypes,
-  IAreaData,
-} from "Layout/Layout/Areas/types/areasTypes";
-import { textToBinary } from "utils";
+import { type FloorPropTypes, type IAreaData } from "@/Layout/Layout/Areas/types/areasTypes";
+import { textToBinary } from "@/utils";
 
 export const updateAreas = (
   allAreas: IAreaData[],
@@ -10,7 +7,7 @@ export const updateAreas = (
   properties: FloorPropTypes,
   selectedArea: string,
   venueId: string,
-  floor: string
+  floor: string,
 ) => {
   const selected: IAreaData = JSON.parse(selectedArea);
 

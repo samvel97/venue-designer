@@ -2,8 +2,8 @@ import { Fragment, memo } from "react";
 import RowTitle from "./RowTitle/RowTitle";
 import Seats from "./Seats/Seats";
 import ResizePoints from "./ResizePoints/ResizePoints";
-import { IRowData, ISeatsData, TActionType } from "../../types/seatsTypes";
-import { hasRotatedItem } from "utils/hasRotatedRow";
+import { type IRowData, type ISeatsData, type TActionType } from "../../types/seatsTypes";
+import { hasRotatedItem } from "@/utils/hasRotatedRow";
 import Rows from "./Rows/Rows";
 interface IRowComponent {
   row: IRowData;
@@ -26,17 +26,12 @@ const RowsComponent = ({
   return (
     <>
       <RowTitle rotate={rotate} row={row} order={row.rowOrder} />
-      {selectedRows.some(
-        (selectedRow) => selectedRow.localId === row.localId
-      ) ? (
+      {selectedRows.some((selectedRow) => selectedRow.localId === row.localId) ? (
         <>
           <Rows row={row} />
           {!hasRotatedItem(selectedRows) && (
             <>
-              <ResizePoints
-                row={row}
-                getCoordsforResizing={getCoordsforResizing}
-              />
+              <ResizePoints row={row} getCoordsforResizing={getCoordsforResizing} />
             </>
           )}
         </>

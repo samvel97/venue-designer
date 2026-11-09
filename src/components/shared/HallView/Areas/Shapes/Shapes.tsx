@@ -1,20 +1,15 @@
-import SvgEllipseElement from "components/ui/SvgEllipseElement/SvgEllipseElement";
-import SvgPathElement from "components/ui/SvgPathElement/SvgPathElement";
-import {
-  presentationBackgroundColor,
-  presentationStrokeColor,
-} from "Layout/Layout/Areas/constants/areasConstants";
-import { IAreaData } from "Layout/Layout/Areas/types/areasTypes";
-import { IRowData, ISeatsData } from "Layout/Layout/Seats/types/seatsTypes";
+import SvgEllipseElement from "@/components/canvas/SvgEllipseElement";
+import SvgPathElement from "@/components/canvas/SvgPathElement";
+import { presentationBackgroundColor, presentationStrokeColor } from "@/Layout/Layout/Areas/constants/areasConstants";
+import { type IAreaData } from "@/Layout/Layout/Areas/types/areasTypes";
+import { type IRowData, type ISeatsData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { Fragment, memo } from "react";
-import { toolType } from "types/types";
-import { getLSData } from "utils/getLsData";
+import { toolType } from "@/types/types";
+import { areaTitle } from "@/utils/areaTitle";
 interface IShapes {
   area: IAreaData;
 }
 const Shapes = ({ area }: IShapes) => {
-  const lang = getLSData("locale");
-
   const drawingShape = () => {
     const { type } = area.properties;
     switch (type) {
@@ -24,7 +19,7 @@ const Shapes = ({ area }: IShapes) => {
             id={`area-${area.localId}`}
             area={area}
             properties={area.properties}
-            title={area.title[lang! as keyof typeof area.title]}
+            title={areaTitle(area.title)}
             textSize={11}
             fill={presentationBackgroundColor[area.areaType]}
             stroke={presentationStrokeColor[area.areaType]}
@@ -38,7 +33,7 @@ const Shapes = ({ area }: IShapes) => {
             id={`area-${area.localId}`}
             area={area}
             properties={area.properties}
-            title={area.title[lang! as keyof typeof area.title]}
+            title={areaTitle(area.title)}
             textSize={11}
             fill={presentationBackgroundColor[area.areaType]}
             stroke={presentationStrokeColor[area.areaType]}

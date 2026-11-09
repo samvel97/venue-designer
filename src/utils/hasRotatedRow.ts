@@ -1,5 +1,5 @@
-import { IRowData } from "Layout/Layout/Seats/types/seatsTypes";
+import { type IRowData } from "@/Layout/Layout/Seats/types/seatsTypes";
 
-export  const hasRotatedItem = (rows: IRowData[]): boolean => {
-    return rows.some((row) => row.properties.rotate !== 0);
-  };
+export const hasRotatedItem = (rows: IRowData[]): boolean => {
+  return rows.some((row) => row.properties.rotate !== 0);
+};

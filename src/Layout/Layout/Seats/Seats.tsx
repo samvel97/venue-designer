@@ -1,216 +1,141 @@
-import { useCallback } from "react";
-import "./style.scss";
-import { useSeats } from "./useSeats";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
+import EditorLayout from "@/components/editor/EditorLayout";
+import Header from "@/components/editor/Header";
+import NumberFields from "@/components/editor/NumberFields";
+import OptionSelect from "@/components/editor/OptionSelect";
+import TextField from "@/components/editor/TextField";
+import ToolGroup from "@/components/editor/ToolGroup";
+import { Button } from "@/components/primitives/button";
+import { Section } from "@/components/primitives/section";
+import { toolType } from "@/types/types";
+import { hasRotatedItem } from "@/utils/hasRotatedRow";
+import { RowTypeEnums, seatCreatingActions, seatManipulationActions } from "./constants/seatsConstants";
 import SeatsSvg from "./SeatsSvg/SeatsSvg";
-import { IAreaData } from "../Areas/types/areasTypes";
-import Header from "Layout/Header/Header";
-import ToolBar from "Layout/ToolBar/ToolBar";
-import ActionsGroup from "components/ui/ActionsGroup/ActionsGroup";
-import { ButtonTypeEnum } from "enums/button-type.enum";
-import {
-  optionsSvgs,
-  seatCreatingActions,
-  seatManipulationActions,
-} from "./constants/seatsConstants";
-import LabelInput from "components/ui/LabelInput/LabelInput";
-import { ManipulationActions } from "types/types";
-import Options from "components/ui/Options/Options";
-import PageSwitcher from "components/ui/PageSwitcher/PageSwitcher";
-import { hasRotatedItem } from "utils/hasRotatedRow";
-import Switcher from "components/ui/Switcher/Switcher";
-import SortOrderSelector from "components/ui/SortOrderSelector/SortOrderSelector";
+import { useSeats } from "./useSeats";
+
+const numberingLabels: Record<RowTypeEnums, string> = {
+  [RowTypeEnums.START_AT_ONE]: "start_at_one",
+  [RowTypeEnums.ROW_TO_ROW]: "row_to_row",
+};
 
 const Seats = () => {
-  const {
-    svgRef,
-    svgContainerRef,
-    multipleSeatsAndRows,
-    seatsType,
-    tempSeats,
-    seatsRows,
-    selectedRows,
-    multipleSelectArea,
-    xyLines,
-    multipleSelectedRowsArea,
-    selectedRowData,
-    selectionRect,
-    selectedArea,
-    selectedAreaId,
-    inputRef,
-    refList,
-    rotatingOutlinedArea,
-    resize,
-    venueId,
-    areasListFromRedux,
-    floor,
-    isEqualRows,
-    rowByOrder,
-    handleSubmit,
-    pathMouseDown,
-    chooseSeats,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleDeleteArea,
-    alignLeft,
-    alignRight,
-    alignCenter,
-    handleTypeChange,
-    handleChangeRowsData,
-    setMultipleSeatsAndRows,
-    getCoordsforResizing,
-    switchRowsByOrder,
-  } = useSeats();
+  const { t } = useTranslation();
+  const { svgRef, svgContainerRef, inputRef, refList, ...editor } = useSeats();
+  const venueId = editor.venueId ?? "";
+  const floor = editor.floor ?? "1";
+  const { selectedRows, selectedRowData, seatsType } = editor;
+  const rotated = hasRotatedItem(selectedRows);
 
-  const manipulationActions: ManipulationActions = {
-    alignLeft: alignLeft,
-    alignRight: alignRight,
-    alignCenter: alignCenter,
-    delete: handleDeleteArea,
+  const handlers: Partial<Record<toolType, () => void>> = {
+    [toolType.alignLeft]: editor.alignLeft,
+    [toolType.alignRight]: editor.alignRight,
+    [toolType.alignCenter]: editor.alignCenter,
+    [toolType.delete]: editor.handleDeleteArea,
   };
-  const checkSelectedCount = () => {
-    if (selectedRows.length === 1 || hasRotatedItem(selectedRows)) {
-      return [seatManipulationActions[seatManipulationActions.length - 1]];
-    }
-    return seatManipulationActions;
-  };
-  const checkOptions = () => {
-    const { curve, order, rotate, rowSpacing, seatSpacing } = selectedRowData;
-    const multipleRows = selectedRows.length > 1;
 
-    if (!hasRotatedItem(selectedRows)) {
-      return multipleRows
-        ? { seatSpacing, rowSpacing, curve, rotate }
-        : { seatSpacing, order, curve, rotate };
-    }
-    return { rotate };
-  };
-  const checkAreaId = useCallback(() => {
-    if (areasListFromRedux && selectedAreaId) {
-      return areasListFromRedux.find(
-        (area: IAreaData) => area.localId === +selectedAreaId
-      );
-    }
-  }, [areasListFromRedux, selectedAreaId]);
-  checkAreaId();
+  const rowActions =
+    selectedRows.length === 1 || rotated
+      ? seatManipulationActions.filter((action) => action.title === toolType.delete)
+      : seatManipulationActions;
+
+  const { curve, order, rotate, rowSpacing, seatSpacing } = selectedRowData;
+  const rowFields = rotated
+    ? { rotate }
+    : selectedRows.length > 1
+      ? { seatSpacing, rowSpacing, curve, rotate }
+      : { seatSpacing, order, curve, rotate };
+
   return (
-    <>
-      <div id="panel-container" tabIndex={0} className="panels-container">
-        <header id="panel-row" tabIndex={0} className="panel-row">
-          <Header venueId={venueId!} floor={floor!} isEqual={isEqualRows} />
-        </header>
+    <EditorLayout
+      header={<Header venueId={venueId} floor={floor} isEqual={editor.isEqualRows} />}
+      canvasRef={svgContainerRef}
+      panning={seatsType === toolType.scrollSvg}
+      sidebar={
+        <>
+          <Section>
+            <div className="flex items-center gap-2">
+              <Button asChild variant="ghost" size="icon-sm">
+                <Link to={`/?id=${venueId}&floor=${floor}`} aria-label={t("toolbar.back")}>
+                  <ArrowLeft />
+                </Link>
+              </Button>
+              <h2 className="text-sm font-semibold">{t("toolbar.manage_seats")}</h2>
+            </div>
+          </Section>
 
-        <div id="panel-row-grow" tabIndex={0} className="panel-row grow">
-          <div id="snap-left" tabIndex={0} className="Panel snap-left">
-            <ToolBar>
-              <>
-                <PageSwitcher
-                  page={"seats"}
-                  venueId={venueId!}
-                  floor={floor!}
+          <Section title={t("toolbar.tools")}>
+            <ToolGroup actions={seatCreatingActions} active={seatsType} onSelect={editor.handleTypeChange} />
+            {seatsType === toolType.multipleXY ? (
+              <NumberFields
+                values={{ ...editor.multipleSeatsAndRows }}
+                refList={refList}
+                onChange={editor.setMultipleSeatsAndRows}
+                onSubmit={editor.handleSubmit}
+              />
+            ) : null}
+            {seatsType === toolType.multipleX ? (
+              <NumberFields
+                values={{ seatSpacing: editor.multipleSeatsAndRows.seatSpacing }}
+                refList={refList}
+                onChange={editor.setMultipleSeatsAndRows}
+              />
+            ) : null}
+          </Section>
+
+          <Section title={t("toolbar.numbering")}>
+            <OptionSelect
+              options={Object.values(RowTypeEnums)}
+              value={editor.rowByOrder ?? RowTypeEnums.START_AT_ONE}
+              onChange={editor.switchRowsByOrder}
+              labelKey={(option) => numberingLabels[option]}
+            />
+          </Section>
+
+          {selectedRows.length ? (
+            <Section title={t("toolbar.rows")}>
+              {selectedRows.length === 1 ? (
+                <TextField
+                  ref={inputRef}
+                  name="order"
+                  label={t("toolbar.order")}
+                  value={order}
+                  onChange={editor.handleChangeRowsData}
                 />
-
-                <ActionsGroup
-                  actionsOptions={seatCreatingActions}
-                  type={ButtonTypeEnum.primary}
-                  tool={seatsType}
-                  handleToolTypeChange={handleTypeChange}
-                />
-                <SortOrderSelector
-                  handleClick={switchRowsByOrder}
-                  isChecked={rowByOrder}
-                />
-                {selectedRows.length === 1 && (
-                  <LabelInput
-                    name="order"
-                    value={selectedRowData.order}
-                    ref={inputRef}
-                    handleChange={handleChangeRowsData}
-                  />
-                )}
-                {selectedRows.length > 0 && (
-                  <>
-                    <div
-                      style={{ border: "1px solid #ECECEC", width: "100%" }}
-                    />
-                    <ActionsGroup
-                      type={ButtonTypeEnum.secondary}
-                      manipulationActions={manipulationActions}
-                      padding
-                      actionsOptions={checkSelectedCount()}
-                      handleToolTypeChange={handleTypeChange}
-                    />
-                    <div
-                      style={{ border: "1px solid #ECECEC", width: "100%" }}
-                    />
-                    <Options
-                      refList={refList}
-                      optionsSvgs={optionsSvgs}
-                      inputValues={checkOptions()}
-                      handleChange={handleChangeRowsData}
-                    />
-                  </>
-                )}
-
-                <div>
-                  {/* <button onMouseDownCapture={handleZoomIn}>-</button>
-                      <button onMouseDownCapture={handleZoomOut}>+</button> */}
-                  {seatsType == "multipleXY" ? (
-                    <Options
-                      refList={refList}
-                      inputValues={multipleSeatsAndRows}
-                      optionsSvgs={optionsSvgs}
-                      handleSubmit={handleSubmit}
-                      handleChange={setMultipleSeatsAndRows}
-                    />
-                  ) : null}
-                  {seatsType == "multipleX" ? (
-                    <Options
-                      refList={refList}
-                      optionsSvgs={optionsSvgs}
-                      inputValues={{
-                        seatSpacing: multipleSeatsAndRows.seatSpacing,
-                      }}
-                      handleChange={setMultipleSeatsAndRows}
-                    />
-                  ) : null}
-                </div>
-              </>
-            </ToolBar>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="svg-container"
-        ref={svgContainerRef}
-        style={{ cursor: seatsType === "scrollSvg" ? "grab" : "default" }}
-      >
-        {selectedArea && (
-          <SeatsSvg
-            ref={svgRef}
-            tempSeats={tempSeats}
-            seatsRows={seatsRows}
-            selectedRows={selectedRows}
-            multipleSelectArea={multipleSelectArea}
-            xyLines={xyLines}
-            multipleSelectedRowsArea={multipleSelectedRowsArea}
-            selectedArea={selectedArea}
-            selectionRect={selectionRect}
-            rotatingOutlinedArea={rotatingOutlinedArea}
-            seatsSpacing={multipleSeatsAndRows.seatSpacing}
-            resize={resize}
-            seatsType={seatsType}
-            pathMouseDown={pathMouseDown}
-            chooseSeats={chooseSeats}
-            handleMouseDown={handleMouseDown}
-            handleMouseMove={handleMouseMove}
-            handleMouseUp={handleMouseUp}
-            getCoordsforResizing={getCoordsforResizing}
-          />
-        )}
-      </div>
-    </>
+              ) : null}
+              <ToolGroup actions={rowActions} onSelect={(action) => handlers[action]?.()} />
+              <NumberFields values={rowFields} refList={refList} onChange={editor.handleChangeRowsData} />
+            </Section>
+          ) : null}
+        </>
+      }
+    >
+      {editor.selectedArea ? (
+        <SeatsSvg
+          ref={svgRef}
+          tempSeats={editor.tempSeats}
+          seatsRows={editor.seatsRows}
+          selectedRows={selectedRows}
+          multipleSelectArea={editor.multipleSelectArea}
+          xyLines={editor.xyLines}
+          multipleSelectedRowsArea={editor.multipleSelectedRowsArea}
+          selectedArea={editor.selectedArea}
+          selectionRect={editor.selectionRect}
+          rotatingOutlinedArea={editor.rotatingOutlinedArea}
+          seatsSpacing={editor.multipleSeatsAndRows.seatSpacing}
+          resize={editor.resize}
+          seatsType={seatsType}
+          pathMouseDown={editor.pathMouseDown}
+          chooseSeats={editor.chooseSeats}
+          handleMouseDown={editor.handleMouseDown}
+          handleMouseMove={editor.handleMouseMove}
+          handleMouseUp={editor.handleMouseUp}
+          getCoordsforResizing={editor.getCoordsforResizing}
+        />
+      ) : null}
+    </EditorLayout>
   );
 };
+
 export default Seats;

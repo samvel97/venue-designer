@@ -1,115 +1,71 @@
-import { createSelector } from "reselect";
-import { RootState } from "store/store";
-import { createSlice } from "@reduxjs/toolkit";
-import { createDispatchers } from "store/dispatcher";
-import {
-  FloorPropTypes,
-  IAreaData,
-  ILayoutView,
-} from "Layout/Layout/Areas/types/areasTypes";
-import { ValidationEnum } from "enums/validation.enum";
-import {
-  validateAreasAndNames,
-  validateAreasInsideFloor,
-} from "utils/validations";
-import { IFetching, RequestTypeEnum } from "types/types";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { FloorPropTypes, IAreaData, ILayoutView } from "@/Layout/Layout/Areas/types/areasTypes";
+import type { ValidationEnum } from "@/enums/validation.enum";
+import { validateAreasAndNames, validateAreasInsideFloor } from "@/utils/validations";
 
 interface IValidationFields {
   isValidate: boolean;
   name: ValidationEnum;
   message: string;
 }
-export interface IValidation {
-  [key: number]: IValidationFields[];
-}
 
-interface IVenueSlice {
+type IValidation = Record<number, IValidationFields[]>;
+
+interface VenueState {
   areas: IAreaData[];
   floorProps: FloorPropTypes;
   layoutView: ILayoutView;
   floorsCount: number;
-  isFetchingRefreshToken: boolean;
   validations: IValidation;
-  isLoading: IFetching;
 }
-export const initialState: IVenueSlice = {
+
+const initialState: VenueState = {
   areas: [],
   floorProps: null,
   layoutView: { properties: null, floor: "" },
   floorsCount: 1,
-  isFetchingRefreshToken: false,
   validations: {},
-  isLoading: {
-    [RequestTypeEnum.ADD_FLOOR]: false,
-    [RequestTypeEnum.GET_FLOOR]: false,
-    [RequestTypeEnum.GET_FLOORS]: false,
-    [RequestTypeEnum.REMOVE_FLOOR]: false,
-    [RequestTypeEnum.SAVE]: false,
-  },
 };
 
-export const venueSlice = createSlice({
+const venueSlice = createSlice({
   name: "venue",
   initialState,
   reducers: {
-    setAreas: (state, action) => {
-      state.areas = action.payload;
+    setAreas: (state, { payload }: PayloadAction<IAreaData[]>) => {
+      state.areas = payload;
     },
-    setFloorsCount: (state, action) => {
-      state.floorsCount = action.payload;
+    setFloorsCount: (state, { payload }: PayloadAction<number>) => {
+      state.floorsCount = payload;
     },
-    setFloorProps: (state, action) => {
-      state.floorProps = action.payload;
+    setFloorProps: (state, { payload }: PayloadAction<FloorPropTypes>) => {
+      state.floorProps = payload;
     },
-    setLayoutViewProps: (state, action) => {
-      state.layoutView = action.payload;
+    setLayoutViewProps: (state, { payload }: PayloadAction<ILayoutView>) => {
+      state.layoutView = payload;
     },
-    setFetchingRefreshToken: (state, { payload }) => {
-      state.isFetchingRefreshToken = payload;
+    setAllInOne: (state, { payload }: PayloadAction<Pick<VenueState, "areas" | "floorsCount" | "floorProps">>) => {
+      Object.assign(state, payload);
     },
-    setAllInOne: (state, action) => {
-      state.areas = action.payload.areas;
-      state.floorsCount = action.payload.floorsCount;
-      state.floorProps = action.payload.floorProps;
-    },
-    setIsLoading: (state, { payload }) => {
-      state.isLoading[payload.key as RequestTypeEnum] = payload.value;
-    },
-    setValidations: (state, { payload }) => {
-      const areas = payload.area ?? (state.areas || []);
+    setValidations: (state, { payload }: PayloadAction<{ floor: string | number | null; area?: IAreaData[] }>) => {
+      const areas = payload.area ?? state.areas;
       const { area, name, outsideSeats } = validateAreasAndNames(areas);
-      const { isValidateFloor, validateIsInsideFloor, validateAreasExisting } =
-        validateAreasInsideFloor(areas, state.floorProps);
-
-      state.validations = {
-        ...state.validations,
-        [payload.floor as string]: [
-          name,
-          area,
-          isValidateFloor,
-          validateIsInsideFloor,
-          validateAreasExisting,
-          outsideSeats,
-        ],
-      };
+      const { isValidateFloor, validateIsInsideFloor, validateAreasExisting } = validateAreasInsideFloor(
+        areas,
+        state.floorProps,
+      );
+      state.validations[Number(payload.floor)] = [
+        name,
+        area,
+        isValidateFloor,
+        validateIsInsideFloor,
+        validateAreasExisting,
+        outsideSeats,
+      ];
     },
   },
 });
 
-export const buildingDispatcher = createDispatchers(venueSlice.actions);
-export const {
-  setAreas,
-  setFloorProps,
-  setLayoutViewProps,
-  setFloorsCount,
-  setAllInOne,
-  setFetchingRefreshToken,
-  setValidations,
-  setIsLoading,
-} = venueSlice.actions;
-export const buildingSelector = createSelector(
-  [(state: RootState) => state.venue],
-  (venue) => venue
-);
+export const { setAreas, setFloorProps, setLayoutViewProps, setFloorsCount, setAllInOne, setValidations } =
+  venueSlice.actions;
 
 export default venueSlice.reducer;

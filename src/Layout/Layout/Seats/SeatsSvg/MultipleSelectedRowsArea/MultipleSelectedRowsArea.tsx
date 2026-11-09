@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { IStandardProperties } from "../../../../../types/types";
-import { TActionType } from "../../types/seatsTypes";
+import { type IStandardProperties } from "../../../../../types/types";
+import { type TActionType } from "../../types/seatsTypes";
 
 const MultipleSelectedRowsArea = ({
   rotatingOutlinedArea,
@@ -18,9 +18,7 @@ const MultipleSelectedRowsArea = ({
         y={y}
         width={width}
         height={height}
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
         stroke="#A0A5BC"
         strokeWidth={1}
         fill="rgba(0, 0, 0, 0)"
@@ -33,9 +31,7 @@ const MultipleSelectedRowsArea = ({
         y2={y - 20}
         stroke="#A0A5BC"
         strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
       />
       <circle
         onMouseDown={(e) => getCoordsforResizing(e, "rotating")}
@@ -44,21 +40,8 @@ const MultipleSelectedRowsArea = ({
         r={4}
         stroke="#A0A5BC"
         strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
+        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${y + height / 2})`}
       />
-      {/* <circle
-        // onMouseDown={(e) => getCoordsforResizing(e, "rotating")}
-        cx={x + width}
-        cy={y + 8}
-        r={4}
-        stroke="#A0A5BC"
-        strokeWidth="2"
-        transform={`rotate(${rotatingOutlinedArea}, ${x + width / 2}, ${
-          y + height / 2
-        })`}
-      /> */}
     </>
   );
 };

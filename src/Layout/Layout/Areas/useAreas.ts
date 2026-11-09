@@ -1,65 +1,38 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useReducer,
-  useMemo,
-  useCallback,
-} from "react";
-import {
-  binaryToText,
-  getLineCenters,
-  stringSlicer,
-  textToBinary,
-} from "../../../utils";
-import {
-  SvgContainerType,
-  SvgElementType,
-  toolType,
-} from "../../../types/types";
+import type React from "react";
+import { useState, useRef, useEffect, useReducer, useMemo, useCallback } from "react";
+import { binaryToText, getLineCenters, stringSlicer, textToBinary } from "../../../utils";
+import { type SvgContainerType, type SvgElementType, toolType } from "../../../types/types";
 import {
   ActionType,
-  FloorPropTypes,
-  IAreaData,
-  IAreasProperties,
-  IComparingData,
-  ILayoutView,
+  type FloorPropTypes,
+  type IAreaData,
+  type IAreasProperties,
+  type IComparingData,
+  type ILayoutView,
 } from "./types/areasTypes";
-import { IRowData, ISeatsData } from "../Seats/types/seatsTypes";
+import { type IRowData, type ISeatsData } from "../Seats/types/seatsTypes";
 import { defaultCornerRadius, ShapeType } from "./constants/areasConstants";
-import { getHigherOrder } from "utils/higherOrder";
-import { calculatingSelectedRowsMInCoords } from "utils/calculatingSelectedRowsMInCoords";
-import { useGetAreasQuery } from "api/api";
+import { getHigherOrder } from "@/utils/higherOrder";
+import { calculatingSelectedRowsMInCoords } from "@/utils/calculatingSelectedRowsMInCoords";
+import { useGetAreasQuery } from "@/api/api";
 import { reducer, initialState } from "./Reducer/areasReducer";
-import { useSearchParams } from "react-router-dom";
-import { useAppDispatch } from "store/hooks";
-import {
-  setAreas,
-  setFloorProps,
-  setFloorsCount,
-  setValidations,
-} from "store/venueSlice";
+import { useSearchParams } from "react-router";
+import { isTypingTarget } from "@/utils/isTypingTarget";
+import { useAppDispatch } from "@/store/hooks";
+import { setAreas, setFloorProps, setFloorsCount, setValidations } from "@/store/venueSlice";
 import { useSelector } from "react-redux";
-import { updateAreas } from "utils/updateAreas";
-import { RootState } from "store/store";
-import { shapeCenter } from "utils/shapeCenter";
+import { updateAreas } from "@/utils/updateAreas";
+import { type RootState } from "@/store/store";
+import { shapeCenter } from "@/utils/shapeCenter";
 
 export const useAreas = () => {
   const [params] = useSearchParams();
   const venueId = params.get("id");
   const floor = params.get("floor");
-  const areas: IAreaData[] = useSelector(
-    (state: RootState) => state.venue.areas
-  );
-  const floorProperties: FloorPropTypes = useSelector(
-    (state: RootState) => state.venue.floorProps
-  );
-  const floorsCount: number = useSelector(
-    (state: RootState) => state.venue.floorsCount
-  );
-  const layoutView: ILayoutView = useSelector(
-    (state: RootState) => state.venue.layoutView
-  );
+  const areas: IAreaData[] = useSelector((state: RootState) => state.venue.areas);
+  const floorProperties: FloorPropTypes = useSelector((state: RootState) => state.venue.floorProps);
+  const floorsCount: number = useSelector((state: RootState) => state.venue.floorsCount);
+  const layoutView: ILayoutView = useSelector((state: RootState) => state.venue.layoutView);
 
   const { data } = useGetAreasQuery({
     id: venueId as string,
@@ -102,7 +75,7 @@ export const useAreas = () => {
   const svgRef = useRef<SvgElementType>(null);
   const inputRef = useRef<null | HTMLInputElement>(null);
   const ticketsCountRef = useRef<null | HTMLInputElement>(null);
-  const refList = useRef<HTMLImageElement[]>([]);
+  const refList = useRef<(HTMLInputElement | null)[]>([]);
   const svgContainerRef = useRef<SvgContainerType>(null);
   const selectOnShapeRef = useRef<boolean>(false);
   const selectOnFloorRef = useRef<boolean>(false);
@@ -116,7 +89,7 @@ export const useAreas = () => {
   const isEqual = useMemo(
     () => !localStorage.getItem(storageKey),
 
-    [data, areas, floorProperties]
+    [data, areas, floorProperties],
   );
 
   const selectShapeType = useCallback(
@@ -125,16 +98,14 @@ export const useAreas = () => {
 
       dispatch({ type: ActionType.SET_SHAPE_TYPE, payload: prop });
     },
-    [shapeType]
+    [shapeType],
   );
   const handleCopyArea = useCallback(() => {
     if (selectedArea.length === 1) {
       dispatch({ type: ActionType.SET_IS_COPYING, payload: true });
       dispatch({
         type: ActionType.SET_COPIED_AREA_INDEX,
-        payload: areas.findIndex(
-          (area) => area?.localId === selectedArea[0]?.localId
-        ),
+        payload: areas.findIndex((area) => area?.localId === selectedArea[0]?.localId),
       });
     }
   }, [selectedArea, isCopying, copiedAreaIndex]);
@@ -143,8 +114,8 @@ export const useAreas = () => {
       const copiedArea = areas[copiedAreaIndex];
       const { x, y, d, type, width } = copiedArea.properties;
 
-      let firstLOccurrence = d?.indexOf("l") || 0;
-      let result = d?.substring(firstLOccurrence);
+      const firstLOccurrence = d?.indexOf("l") || 0;
+      const result = d?.substring(firstLOccurrence);
       let copiedWidth = width;
       if (type === toolType.pen) {
         const { minX, maxX } = shapeCenter(d!);
@@ -172,11 +143,7 @@ export const useAreas = () => {
         properties: {
           ...copiedArea.properties,
           x: x + copiedWidth + 20,
-          d:
-            type === toolType.pen
-              ? `M ${Math.max(x + copiedWidth + 20, 0)} ${Math.max(y, 0)}` +
-                result
-              : undefined,
+          d: type === toolType.pen ? `M ${Math.max(x + copiedWidth + 20, 0)} ${Math.max(y, 0)}` + result : undefined,
         },
         areaType: copiedArea.areaType,
         ticketsCount: copiedArea.ticketsCount,
@@ -197,12 +164,7 @@ export const useAreas = () => {
     (selectedArea: IAreaData[]) => {
       if (selectedArea.length > 0 || selectedFloor) {
         const selected = selectedFloor || selectedArea[0].properties;
-        const {
-          cornerBottomLeft,
-          cornerBottomRight,
-          cornerTopLeft,
-          cornerTopRight,
-        } = selected;
+        const { cornerBottomLeft, cornerBottomRight, cornerTopLeft, cornerTopRight } = selected;
 
         const props = {
           ...selected,
@@ -232,9 +194,7 @@ export const useAreas = () => {
           type: ActionType.SET_SELECTED_AREAS,
           payload: [mirroredArea],
         });
-        const areaIndex = areas.findIndex(
-          (area) => area.localId === selectedArea[0].localId
-        );
+        const areaIndex = areas.findIndex((area) => area.localId === selectedArea[0].localId);
         const updatedAreas = [...areas];
         updatedAreas[areaIndex] = mirroredArea;
         reduxDispatch(setAreas(updatedAreas));
@@ -246,18 +206,13 @@ export const useAreas = () => {
         localStorage.setItem(`venue_${floor}_${venueId}_areas`, makeBinary);
       }
     },
-    [selectedArea, inputValues, areas]
+    [selectedArea, inputValues, areas],
   );
   const flipVertical = useCallback(
     (selectedArea: IAreaData[]) => {
       if (selectedArea.length > 0 || selectedFloor) {
         const selected = selectedFloor || selectedArea[0].properties;
-        const {
-          cornerBottomLeft,
-          cornerBottomRight,
-          cornerTopLeft,
-          cornerTopRight,
-        } = selected;
+        const { cornerBottomLeft, cornerBottomRight, cornerTopLeft, cornerTopRight } = selected;
         const props = {
           ...selected,
           cornerTopRight: cornerBottomRight,
@@ -273,7 +228,6 @@ export const useAreas = () => {
             properties: props,
             areas: areas,
           });
-          // handlingSelectProps(mirroredArea)
 
           localStorage.setItem(`venue_${floor}_${venueId}_areas`, makeBinary);
           return;
@@ -288,9 +242,7 @@ export const useAreas = () => {
           type: ActionType.SET_SELECTED_AREAS,
           payload: [mirroredArea],
         });
-        const areaIndex = areas.findIndex(
-          (area) => area.localId === selectedArea[0].localId
-        );
+        const areaIndex = areas.findIndex((area) => area.localId === selectedArea[0].localId);
         const updatedAreas = [...areas];
         updatedAreas[areaIndex] = mirroredArea;
         reduxDispatch(setAreas(updatedAreas));
@@ -302,7 +254,7 @@ export const useAreas = () => {
         localStorage.setItem(`venue_${floor}_${venueId}_areas`, makeBinary);
       }
     },
-    [selectedArea, areas, inputValues]
+    [selectedArea, areas, inputValues],
   );
 
   const handleSelectArea = useCallback(
@@ -318,9 +270,7 @@ export const useAreas = () => {
         if (event.ctrlKey) {
           let newSelectedAreas = [];
           if (selectedArea.some((item) => item.localId === area.localId)) {
-            newSelectedAreas = selectedArea.filter(
-              (elem) => elem.localId !== area.localId
-            );
+            newSelectedAreas = selectedArea.filter((elem) => elem.localId !== area.localId);
           } else {
             newSelectedAreas = [...selectedArea, area];
           }
@@ -339,8 +289,7 @@ export const useAreas = () => {
             payload: scaledY - areaY,
           });
           if (area.rows.length) {
-            const selectedRowsAreaForRotating =
-              calculatingSelectedRowsMInCoords(area.rows);
+            const selectedRowsAreaForRotating = calculatingSelectedRowsMInCoords(area.rows);
             dispatch({
               type: ActionType.SET_ROWS_MOUSE_OFFSET,
               payload: {
@@ -352,7 +301,7 @@ export const useAreas = () => {
         }
       }
     },
-    [selectedArea, mouseOffsetX, mouseOffsetY, rowsMouseOffset]
+    [selectedArea, mouseOffsetX, mouseOffsetY, rowsMouseOffset],
   );
   const handleSelectFloor = useCallback(
     (event: React.MouseEvent, floor: FloorPropTypes, scale: number) => {
@@ -379,7 +328,7 @@ export const useAreas = () => {
         });
       }
     },
-    [selectedFloor, mouseOffsetX, mouseOffsetY, selectOnShapeRef]
+    [selectedFloor, mouseOffsetX, mouseOffsetY, selectOnShapeRef],
   );
   const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -387,15 +336,8 @@ export const useAreas = () => {
       const rect = svgRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
-      if (
-        toolTypeRef?.current !== toolType.select &&
-        toolTypeRef?.current !== toolType.selectFloor
-      ) {
-        if (
-          toolTypeRef?.current === toolType.scrollSvg &&
-          svgContainerRef.current
-        ) {
-          //scrolling svg
+      if (toolTypeRef?.current !== toolType.select && toolTypeRef?.current !== toolType.selectFloor) {
+        if (toolTypeRef?.current === toolType.scrollSvg && svgContainerRef.current) {
           dispatch({ type: ActionType.SET_START_X, payload: event.clientX });
           dispatch({ type: ActionType.SET_START_Y, payload: event.clientY });
           dispatch({
@@ -448,11 +390,7 @@ export const useAreas = () => {
         if (selectedFloor && !selectOnFloorRef.current && !event.ctrlKey) {
           dispatch({ type: ActionType.SET_SELECTED_FLOOR, payload: null });
         }
-        if (
-          selectedArea.length &&
-          !selectOnShapeRef.current &&
-          !event.ctrlKey
-        ) {
+        if (selectedArea.length && !selectOnShapeRef.current && !event.ctrlKey) {
           dispatch({
             type: ActionType.SET_START_POSITION,
             payload: { x: event.clientX, y: event.clientY },
@@ -484,7 +422,6 @@ export const useAreas = () => {
   const handleMouseMove = (event: React.MouseEvent) => {
     event.preventDefault();
     const scale = 1;
-    // dispatch({ type: ActionType.SET_RESIZE_CURSOR, payload: false });
     if (svgRef.current) {
       const rect = svgRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -493,13 +430,8 @@ export const useAreas = () => {
       const scaledY = y / scale;
       const scaledStartX = startX / scale;
       const scaledStartY = startY / scale;
-      const mouseOffsetXScaled = mouseOffsetX / scale;
-      const mouseOffsetYScaled = mouseOffsetY / scale;
       if (dragging) {
-        if (
-          toolTypeRef?.current !== toolType.select &&
-          toolTypeRef?.current !== toolType.selectFloor
-        ) {
+        if (toolTypeRef?.current !== toolType.select && toolTypeRef?.current !== toolType.selectFloor) {
           if (tool === toolType.scrollSvg && svgContainerRef.current) {
             const x = event.clientX / scale;
             const y = event.clientY / scale;
@@ -508,12 +440,6 @@ export const useAreas = () => {
             svgContainerRef.current.scrollTop = scrollTop - deltaY;
             svgContainerRef.current.scrollLeft = scrollLeft - deltaX;
           } else {
-            // drawing a new shape
-
-            // const scaledX = x / scale;
-            // const scaledY = y / scale;
-            // const scaledStartX = startX / scale;
-            // const scaledStartY = startY / scale;
             const width = scaledX - scaledStartX;
             const height = scaledY - scaledStartY;
             const pathX = width < 0 ? scaledX : scaledStartX;
@@ -527,7 +453,6 @@ export const useAreas = () => {
               rotate: 0,
             };
             if (toolTypeRef?.current === toolType.pen) {
-              //pti scale dzvi
               let initCoords = tempShape[0].properties.d;
               if (tempShape[0].properties.d?.includes("l")) {
                 initCoords = stringSlicer(tempShape[0].properties.d!);
@@ -561,13 +486,12 @@ export const useAreas = () => {
             dispatch({ type: ActionType.SET_TEMP_SHAPE, payload: [newArea] });
           }
         } else {
-          //moving floor
           if (selectedFloor) {
             createRefActionName.current = "moving";
             const newX = scaledX - mouseOffsetX;
             const newY = scaledY - mouseOffsetY;
-            let firstLOccurrence = selectedFloor.d?.indexOf("l") || 0;
-            let result = selectedFloor.d?.substring(firstLOccurrence);
+            const firstLOccurrence = selectedFloor.d?.indexOf("l") || 0;
+            const result = selectedFloor.d?.substring(firstLOccurrence);
             const props = {
               ...selectedFloor,
               x: Math.max(newX, 0),
@@ -590,52 +514,43 @@ export const useAreas = () => {
           if (selectedArea.length === 1) {
             if (resizing && resizeCorner === "bottom-right") {
             } else {
-              // moving a shape
               createRefActionName.current = "moving";
               const newX = scaledX - mouseOffsetX;
               const newY = scaledY - mouseOffsetY;
               const selected = selectedArea[0].properties;
-              let firstLOccurrence = selected.d?.indexOf("l") || 0;
-              let result = selected.d?.substring(firstLOccurrence);
+              const firstLOccurrence = selected.d?.indexOf("l") || 0;
+              const result = selected.d?.substring(firstLOccurrence);
 
               const props = {
                 ...selected,
                 x: Math.max(newX, 0),
                 y: Math.max(newY, 0),
-                d:
-                  selected.type === "pen"
-                    ? `M ${Math.max(newX, 0)} ${Math.max(newY, 0)}` + result
-                    : undefined,
+                d: selected.type === "pen" ? `M ${Math.max(newX, 0)} ${Math.max(newY, 0)}` + result : undefined,
               };
 
               let rows: null | IRowData[] = null;
               if (selectedArea[0].rows.length) {
                 const newXForRows = x - rowsMouseOffset.x;
                 const newYForRows = y - rowsMouseOffset.y;
-                const { x: minX, y: minY } = calculatingSelectedRowsMInCoords(
-                  selectedArea[0].rows,
-                  true
-                );
-                const updatedRows: IRowData[] = selectedArea[0].rows.map(
-                  (row) => {
-                    const updatedSeats = row.seats.map((seat: ISeatsData) => {
-                      const myX = newXForRows - (minX - seat.properties.x);
-                      const myY = newYForRows - (minY - seat.properties.y);
-                      return {
-                        ...seat,
-                        properties: {
-                          ...seat.properties,
-                          x: myX,
-                          y: myY,
-                        },
-                      };
-                    });
+                const { x: minX, y: minY } = calculatingSelectedRowsMInCoords(selectedArea[0].rows, true);
+                const updatedRows: IRowData[] = selectedArea[0].rows.map((row) => {
+                  const updatedSeats = row.seats.map((seat: ISeatsData) => {
+                    const myX = newXForRows - (minX - seat.properties.x);
+                    const myY = newYForRows - (minY - seat.properties.y);
                     return {
-                      ...row,
-                      seats: updatedSeats,
+                      ...seat,
+                      properties: {
+                        ...seat.properties,
+                        x: myX,
+                        y: myY,
+                      },
                     };
-                  }
-                );
+                  });
+                  return {
+                    ...row,
+                    seats: updatedSeats,
+                  };
+                });
                 rows = updatedRows;
               }
               dispatch({
@@ -653,37 +568,23 @@ export const useAreas = () => {
         }
       } else {
         if (selectedArea.length === 1) {
-          let blum = getLineCenters(
+          const blum = getLineCenters(
             selectedArea[0].properties.x,
             selectedArea[0].properties.y,
             selectedArea[0].properties.width,
-            selectedArea[0].properties.height
+            selectedArea[0].properties.height,
           );
           if (
-            (x < blum.top.x + 10 &&
-              x > blum.top.x - 10 &&
-              y < blum.top.y + 5 &&
-              y > blum.top.y - 5) ||
-            (x < blum.bottom.x + 10 &&
-              x > blum.bottom.x - 10 &&
-              y > blum.bottom.y - 5 &&
-              y < blum.bottom.y + 5) ||
+            (x < blum.top.x + 10 && x > blum.top.x - 10 && y < blum.top.y + 5 && y > blum.top.y - 5) ||
+            (x < blum.bottom.x + 10 && x > blum.bottom.x - 10 && y > blum.bottom.y - 5 && y < blum.bottom.y + 5) ||
             (x === blum.left.x && y === blum.left.y) ||
             (x === blum.right.x && y === blum.right.y)
           ) {
             dispatch({ type: ActionType.SET_RESIZE_CURSOR, payload: true });
           }
-          const {
-            x: areaX,
-            y: areaY,
-            width,
-            height,
-          } = selectedArea[0].properties;
+          const { x: areaX, y: areaY, width, height } = selectedArea[0].properties;
           const isResizing =
-            x >= areaX + width - 10 &&
-            x <= areaX + width &&
-            y >= areaY + height - 10 &&
-            y <= areaY + height;
+            x >= areaX + width - 10 && x <= areaX + width && y >= areaY + height - 10 && y <= areaY + height;
           if (isResizing) {
             dispatch({ type: ActionType.SET_RESIZE_CURSOR, payload: true });
           }
@@ -692,14 +593,12 @@ export const useAreas = () => {
     }
   };
 
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handleMouseUp = () => {
     if (tempShape.length) {
       let temp = tempShape;
 
       if (createRefActionName.current === "moving") {
-        const updatedAreas = areas.map((area) =>
-          area?.localId === temp[0]?.localId ? temp[0] : area
-        );
+        const updatedAreas = areas.map((area) => (area?.localId === temp[0]?.localId ? temp[0] : area));
         reduxDispatch(setAreas(updatedAreas));
         const makeBinary = textToBinary({
           floorsCount: floorsCount,
@@ -724,11 +623,7 @@ export const useAreas = () => {
                 ...temp[0],
                 properties: {
                   ...temp[0].properties,
-                  d:
-                    coords +
-                    `l ${temp[0].properties.x - startX} ${
-                      temp[0].properties.y - startY
-                    } Z`,
+                  d: coords + `l ${temp[0].properties.x - startX} ${temp[0].properties.y - startY} Z`,
                 },
               },
             ];
@@ -776,10 +671,7 @@ export const useAreas = () => {
       localStorage.setItem(`venue_${floor}_${venueId}_areas`, makeBinary);
     }
     if (selectedArea.length > 0) {
-      const updatedAreas = areas.filter(
-        (area) =>
-          !selectedArea.some((selected) => selected.localId === area.localId)
-      );
+      const updatedAreas = areas.filter((area) => !selectedArea.some((selected) => selected.localId === area.localId));
       reduxDispatch(setAreas(updatedAreas));
       const makeBinary = textToBinary({
         floorsCount: floorsCount,
@@ -851,24 +743,18 @@ export const useAreas = () => {
             payload: [updatedArea],
           });
           reduxDispatch(
-            setAreas(
-              areas.map((area) =>
-                area?.localId === selectedArea[0]?.localId ? updatedArea : area
-              )
-            )
+            setAreas(areas.map((area) => (area?.localId === selectedArea[0]?.localId ? updatedArea : area))),
           );
           const makeBinary = textToBinary({
             floorsCount: floorsCount,
             properties: floorProperties,
-            areas: areas.map((area) =>
-              area?.localId === selectedArea[0]?.localId ? updatedArea : area
-            ),
+            areas: areas.map((area) => (area?.localId === selectedArea[0]?.localId ? updatedArea : area)),
           });
           localStorage.setItem(`venue_${floor}_${venueId}_areas`, makeBinary);
         }
       }
     },
-    [inputValues, areas, selectedArea]
+    [inputValues, areas, selectedArea],
   );
   const handleToolTypeChange = useCallback(
     (type: toolType) => {
@@ -898,13 +784,12 @@ export const useAreas = () => {
         },
       });
     },
-    [floorProperties, inputValues, selectedArea, resizing, resizeCorner]
+    [floorProperties, inputValues, selectedArea, resizing, resizeCorner],
   );
   const handleSetFocused = () => {
     if (
       !inputRef.current ||
-      (selectedArea[0]?.areaType === ShapeType.WITHOUT_SEATS &&
-        !ticketsCountRef.current) ||
+      (selectedArea[0]?.areaType === ShapeType.WITHOUT_SEATS && !ticketsCountRef.current) ||
       refList.current.length === 0
     )
       return;
@@ -926,10 +811,7 @@ export const useAreas = () => {
       payload: !sectionConTentView,
     });
   }, [sectionConTentView]);
-  const movingSVGToCenter = (
-    svgContainerRef: any,
-    floorProps?: FloorPropTypes
-  ) => {
+  const movingSVGToCenter = (svgContainerRef: any, floorProps?: FloorPropTypes) => {
     let coordX = 10000;
     let coordY = 10000;
     const containerWidth = svgContainerRef.current.clientWidth;
@@ -956,15 +838,16 @@ export const useAreas = () => {
   }, [tool]);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isSVGFocused) {
-        if ((event.ctrlKey && event.key === "c") || event.key === "C") {
+      if (isSVGFocused && (event.ctrlKey || event.metaKey) && !isTypingTarget(event)) {
+        const key = event.key.toLowerCase();
+        if (key === "c") {
           event.preventDefault();
           handleCopyArea();
-        } else if ((event.ctrlKey && event.key === "v") || event.key === "C") {
+        } else if (key === "v") {
           dispatch({ type: ActionType.SET_IS_PASTING, payload: true });
           event.preventDefault();
           handlePasteArea();
-        } else if ((event.ctrlKey && event.key === "a") || event.key === "A") {
+        } else if (key === "a") {
           event.preventDefault();
           dispatch({ type: ActionType.SET_SELECTED_AREAS, payload: areas });
           dispatch({
@@ -976,14 +859,7 @@ export const useAreas = () => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    isSVGFocused,
-    isCopying,
-    isPasting,
-    selectedArea,
-    selectedFloor,
-    copiedAreaIndex,
-  ]);
+  }, [isSVGFocused, isCopying, isPasting, selectedArea, selectedFloor, copiedAreaIndex]);
   useEffect(() => {
     if (
       inputRef.current !== document.activeElement &&
@@ -991,7 +867,7 @@ export const useAreas = () => {
       !refList.current.some((ref) => ref === document.activeElement)
     ) {
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === "Delete") {
+        if (event.key === "Delete" && !isTypingTarget(event)) {
           event.preventDefault();
           handleDeleteArea();
         }
@@ -1001,9 +877,7 @@ export const useAreas = () => {
     }
   }, [selectedArea, selectedFloor]);
   useEffect(() => {
-    const fromLocalStorage = localStorage.getItem(
-      `venue_${floor}_${venueId}_areas`
-    ) as any;
+    const fromLocalStorage = localStorage.getItem(`venue_${floor}_${venueId}_areas`) as any;
     const decodedData = data?.layout ? binaryToText(data?.layout) : null;
 
     decompressedDataFromDbRef.current = decodedData
@@ -1041,19 +915,10 @@ export const useAreas = () => {
     };
   }, [svgRef.current, handleFocusChange]);
   useEffect(() => {
-    const selectedArea = localStorage.getItem(
-      `${floor}_${venueId}_selectedArea`
-    );
+    const selectedArea = localStorage.getItem(`${floor}_${venueId}_selectedArea`);
     if (selectedArea && areas) {
-      const areasList = updateAreas(
-        areas,
-        floorsCount,
-        floorProperties,
-        selectedArea,
-        venueId!,
-        floor!
-      );
-      reduxDispatch(setAreas(areasList?.managedList));
+      const areasList = updateAreas(areas, floorsCount, floorProperties, selectedArea, venueId!, floor!);
+      if (areasList) reduxDispatch(setAreas(areasList.managedList));
     }
   }, [areas, floorsCount, floorProperties]);
 

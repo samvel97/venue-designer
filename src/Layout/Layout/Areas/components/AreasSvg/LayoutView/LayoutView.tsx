@@ -1,9 +1,9 @@
 import { memo } from "react";
-import { FloorPropTypes } from "../../../types/areasTypes";
+import { type FloorPropTypes } from "../../../types/areasTypes";
 
-import SvgPathElement from "components/ui/SvgPathElement/SvgPathElement";
-import SvgEllipseElement from "components/ui/SvgEllipseElement/SvgEllipseElement";
-import { toolType } from "types/types";
+import SvgPathElement from "@/components/canvas/SvgPathElement";
+import SvgEllipseElement from "@/components/canvas/SvgEllipseElement";
+import { toolType } from "@/types/types";
 type Props = {
   floorProperties: FloorPropTypes;
 };
@@ -40,11 +40,7 @@ const LayoutView = ({ floorProperties }: Props) => {
       />
     ),
   };
-  return (
-    <>
-      {backgroundShape[floorProperties?.type as keyof typeof backgroundShape]}
-    </>
-  );
+  return <>{backgroundShape[floorProperties?.type as keyof typeof backgroundShape]}</>;
 };
 
 export default memo(LayoutView);

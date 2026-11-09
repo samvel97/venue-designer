@@ -1,11 +1,7 @@
 import { memo } from "react";
-import { IStandardProperties } from "../../../../../types/types";
+import { type IStandardProperties } from "../../../../../types/types";
 
-const AreaForSelectingRows = ({
-  selectionRect,
-}: {
-  selectionRect: IStandardProperties;
-}) => {
+const AreaForSelectingRows = ({ selectionRect }: { selectionRect: IStandardProperties }) => {
   return (
     <rect
       x={selectionRect.x}

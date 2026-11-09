@@ -1,4 +1,4 @@
-import { IRowData, ISeatsData } from "Layout/Layout/Seats/types/seatsTypes";
+import { type IRowData, type ISeatsData } from "@/Layout/Layout/Seats/types/seatsTypes";
 
 export const curveRow = (selectedRows: IRowData[], curve?: number) => {
   return selectedRows.map((row: IRowData) => {
@@ -29,14 +29,12 @@ export const curveRow = (selectedRows: IRowData[], curve?: number) => {
       if (i < middleItemIndex) {
         curvedY =
           y +
-          Math.pow(middleItemIndex - (seats.length % 2 === 0 ? i + 1 : i), 2) *
-            curveAmountForEachSeat -
+          Math.pow(middleItemIndex - (seats.length % 2 === 0 ? i + 1 : i), 2) * curveAmountForEachSeat -
           Math.pow(middleItemIndex, 2) * curveAmountForEachSeat +
           bla;
         curvedX =
           seats[seats.length - 1].properties.x -
-          (middleItemIndex - (seats.length % 2 === 0 ? i + 1 : i)) *
-            seatSpacing -
+          (middleItemIndex - (seats.length % 2 === 0 ? i + 1 : i)) * seatSpacing -
           middleItemIndex * seatSpacing;
       } else if (i > middleItemIndex) {
         curvedY =

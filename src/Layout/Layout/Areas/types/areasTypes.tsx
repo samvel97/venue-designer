@@ -1,6 +1,6 @@
-import { Coords, IStandardProperties, Ititle, toolType } from "types/types";
-import { IRowData } from "../../Seats/types/seatsTypes";
-import { ShapeType } from "../constants/areasConstants";
+import { type Coords, type IStandardProperties, type Ititle, type toolType } from "@/types/types";
+import { type IRowData } from "../../Seats/types/seatsTypes";
+import { type ShapeType } from "../constants/areasConstants";
 
 export type FloorPropTypes = null | IAreasProperties;
 
@@ -54,7 +54,7 @@ export interface IAreasProperties extends IStandardProperties {
   d?: string;
 }
 
-export interface ICornerRadiuses {
+interface ICornerRadiuses {
   cornerTopRight?: number;
   cornerTopLeft?: number;
   cornerBottomRight?: number;
@@ -67,7 +67,6 @@ export interface IManipulationProperties extends ICornerRadiuses {
   rotate: number;
 }
 
-// Enums
 export enum ActionType {
   SET_AREAS = "SET_AREAS",
   SET_SHAPE_TYPE = "SET_SHAPE_TYPE",
@@ -96,7 +95,6 @@ export enum ActionType {
   SET_SECTION_CONTENT_VIEW = "SET_SECTION_CONTENT_VIEW",
 }
 
-// Action types
 type SetAreasAction = { type: ActionType.SET_AREAS; payload: IAreaData[] };
 type SetShapeTypeAction = {
   type: ActionType.SET_SHAPE_TYPE;
@@ -218,17 +216,6 @@ export interface IDecodedLayout {
   properties: FloorPropTypes;
   areas: IAreaData[];
 }
-
-export type TShapeFillColor =
-  | "rgb(200, 220, 240)"
-  | "rgb(220, 220, 220)"
-  | "rgb(230, 230, 230)"
-  | "#FFFFFF";
-
-export type TShapeStrokeColor =
-  | "rgb(160, 165, 188)"
-  | "rgb(204, 204, 204)"
-  | "#ECECEC";
 
 export type BackgroundColorType = {
   [key in ShapeType]: string;

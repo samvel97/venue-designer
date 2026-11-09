@@ -1,18 +1,11 @@
-import {
-  FloorPropTypes,
-  IAreaData,
-} from "Layout/Layout/Areas/types/areasTypes";
+import { type FloorPropTypes, type IAreaData } from "@/Layout/Layout/Areas/types/areasTypes";
 import { shapeCenter } from "./shapeCenter";
-import { IMInMax, toolType } from "types/types";
+import { type IMInMax, toolType } from "@/types/types";
 import { findMinMaxCoordinates } from "./areasMinMaxCoords";
-import { ValidationEnum } from "enums/validation.enum";
-import { ShapeType } from "Layout/Layout/Areas/constants/areasConstants";
+import { ValidationEnum } from "@/enums/validation.enum";
+import { ShapeType } from "@/Layout/Layout/Areas/constants/areasConstants";
 
-export const validationOutsideSeats = (
-  selectedArea: IAreaData,
-  pointX: number,
-  pointY: number
-) => {
+const validationOutsideSeats = (selectedArea: IAreaData, pointX: number, pointY: number) => {
   let isValidPosition = false;
 
   if (selectedArea.properties.type === toolType.pen) {
@@ -22,25 +15,17 @@ export const validationOutsideSeats = (
     const path = new Path2D(d);
     if (!ctx) return;
     if (rotate) {
-      let { centerX: cX, centerY: cY } = shapeCenter(d as string);
-      const rotationMatch = `rotate(${rotate}, ${cX}, ${cY})`.match(
-        /rotate\(([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)/
-      );
+      const { centerX: cX, centerY: cY } = shapeCenter(d as string);
+      const rotationMatch = `rotate(${rotate}, ${cX}, ${cY})`.match(/rotate\(([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)/);
       if (rotationMatch) {
-        const [_, angle, centerX, centerY] = rotationMatch.map(Number);
+        const [, angle, centerX, centerY] = rotationMatch.map(Number);
         const radians = (angle * Math.PI) / 180;
         const translatedX = pointX - centerX;
         const translatedY = pointY - centerY;
-        const rotatedX =
-          translatedX * Math.cos(-radians) - translatedY * Math.sin(-radians);
-        const rotatedY =
-          translatedX * Math.sin(-radians) + translatedY * Math.cos(-radians);
+        const rotatedX = translatedX * Math.cos(-radians) - translatedY * Math.sin(-radians);
+        const rotatedY = translatedX * Math.sin(-radians) + translatedY * Math.cos(-radians);
 
-        isValidPosition = ctx.isPointInPath(
-          path,
-          rotatedX + centerX,
-          rotatedY + centerY
-        );
+        isValidPosition = ctx.isPointInPath(path, rotatedX + centerX, rotatedY + centerY);
       }
     } else {
       isValidPosition = ctx.isPointInPath(path, pointX, pointY);
@@ -65,17 +50,11 @@ export const validationOutsideSeats = (
     const shapeD = `
           M ${x + topLeft || 0} ${y}
           L ${x + areaW - (topRight || 0)} ${y}
-          A ${topRight || 0} ${topRight || 0}, 0, 0, 1, ${x + areaW} ${
-      y + (topRight || 0)
-    }
+          A ${topRight || 0} ${topRight || 0}, 0, 0, 1, ${x + areaW} ${y + (topRight || 0)}
           L ${x + areaW} ${y + areaH - (bottomRight || 0)}
-          A ${bottomRight || 0} ${bottomRight || 0}, 0, 0, 1, ${
-      x + areaW - (bottomRight || 0)
-    } ${y + areaH}
+          A ${bottomRight || 0} ${bottomRight || 0}, 0, 0, 1, ${x + areaW - (bottomRight || 0)} ${y + areaH}
           L ${x + (bottomLeft || 0)} ${y + areaH}
-          A ${bottomLeft || 0} ${bottomLeft || 0}, 0, 0, 1, ${x} ${
-      y + areaH - (bottomLeft || 0)
-    }
+          A ${bottomLeft || 0} ${bottomLeft || 0}, 0, 0, 1, ${x} ${y + areaH - (bottomLeft || 0)}
           L ${x} ${y + (topLeft || 0)}
           A ${topLeft || 0} ${topLeft || 0}, 0, 0, 1, ${x + (topLeft || 0)} ${y}
           Z
@@ -85,38 +64,25 @@ export const validationOutsideSeats = (
     const path = new Path2D(shapeD);
     if (!ctx) return;
     if (rotate) {
-      let myCenterX = x + areaW / 2;
-      let myCenterY = y + areaH / 2;
-      const rotationMatch =
-        `rotate(${rotate}, ${myCenterX}, ${myCenterY})`.match(
-          /rotate\(([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)/
-        );
+      const myCenterX = x + areaW / 2;
+      const myCenterY = y + areaH / 2;
+      const rotationMatch = `rotate(${rotate}, ${myCenterX}, ${myCenterY})`.match(
+        /rotate\(([\d.-]+),\s*([\d.-]+),\s*([\d.-]+)\)/,
+      );
       if (rotationMatch) {
-        const [_, angle, centerX, centerY] = rotationMatch.map(Number);
+        const [, angle, centerX, centerY] = rotationMatch.map(Number);
         const radians = (angle * Math.PI) / 180;
         const translatedX = pointX - centerX;
         const translatedY = pointY - centerY;
-        const rotatedX =
-          translatedX * Math.cos(-radians) - translatedY * Math.sin(-radians);
-        const rotatedY =
-          translatedX * Math.sin(-radians) + translatedY * Math.cos(-radians);
-        isValidPosition = ctx.isPointInPath(
-          path,
-          rotatedX + centerX,
-          rotatedY + centerY
-        );
+        const rotatedX = translatedX * Math.cos(-radians) - translatedY * Math.sin(-radians);
+        const rotatedY = translatedX * Math.sin(-radians) + translatedY * Math.cos(-radians);
+        isValidPosition = ctx.isPointInPath(path, rotatedX + centerX, rotatedY + centerY);
       }
     } else {
       isValidPosition = ctx.isPointInPath(path, pointX, pointY);
     }
   } else if (selectedArea.properties.type === toolType.ellipse) {
-    const {
-      height: areaH,
-      width: areaW,
-      x,
-      y,
-      rotate,
-    } = selectedArea.properties;
+    const { height: areaH, width: areaW, x, y, rotate } = selectedArea.properties;
     const cx = x + areaW / 2;
     const cy = y + areaH / 2;
     const rx = areaW / 2;
@@ -132,10 +98,7 @@ export const validationOutsideSeats = (
     const rotatedX = translatedX * cosTheta + translatedY * sinTheta;
     const rotatedY = -translatedX * sinTheta + translatedY * cosTheta;
 
-    // Check if the rotated point is within the ellipse boundaries
-    const insideEllipse =
-      (rotatedX * rotatedX) / (rx * rx) + (rotatedY * rotatedY) / (ry * ry) <=
-      1;
+    const insideEllipse = (rotatedX * rotatedX) / (rx * rx) + (rotatedY * rotatedY) / (ry * ry) <= 1;
 
     isValidPosition = insideEllipse;
   }
@@ -172,11 +135,7 @@ export const validateAreasAndNames = (areas: IAreaData[]) => {
       }
     }
     const areaTypes = [ShapeType.WITHOUT_SEATS, ShapeType.WITH_SEATS];
-    if (
-      !area.ticketsCount &&
-      !area.rows.length &&
-      areaTypes.includes(area.areaType)
-    ) {
+    if (!area.ticketsCount && !area.rows.length && areaTypes.includes(area.areaType)) {
       validation.area.isValidate = false;
       validation.area.message = ValidationEnum.AREA_RESERVATION;
     }
@@ -186,11 +145,7 @@ export const validateAreasAndNames = (areas: IAreaData[]) => {
         const seats = area.rows[i].seats;
         if (!validation.outsideSeats.isValidate) break;
         for (let j = 0; j < seats.length; j++) {
-          const validate = validationOutsideSeats(
-            area,
-            seats[j].properties.x,
-            seats[j].properties.y
-          );
+          const validate = validationOutsideSeats(area, seats[j].properties.x, seats[j].properties.y);
 
           validation.outsideSeats.isValidate = validate ?? true;
 
@@ -205,7 +160,7 @@ export const validateAreasAndNames = (areas: IAreaData[]) => {
   return validation;
 };
 
-export const validateFloor = (floorProps: FloorPropTypes) => {
+const validateFloor = (floorProps: FloorPropTypes) => {
   let validateFloor = false;
   let validationMessage = "";
 
@@ -220,10 +175,7 @@ export const validateFloor = (floorProps: FloorPropTypes) => {
   };
 };
 
-export const validateAreasInsideFloor = (
-  areas: IAreaData[],
-  floorProps: FloorPropTypes
-) => {
+export const validateAreasInsideFloor = (areas: IAreaData[], floorProps: FloorPropTypes) => {
   const validateIsInsideFloor = {
     name: ValidationEnum.OUTSIDE_AREAS,
     isValidate: true,
@@ -239,13 +191,10 @@ export const validateAreasInsideFloor = (
     validateAreasExisting.isValidate = false;
     validateAreasExisting.message = ValidationEnum.AREA_EXISTING;
   }
-  let isValidateFloor = validateFloor(floorProps);
+  const isValidateFloor = validateFloor(floorProps);
 
   if (isValidateFloor.isValidate && floorProps && areas.length) {
-    const { biggestX, biggestY, smallestX, smallestY } = findMinMaxCoordinates(
-      areas,
-      null
-    ) as IMInMax;
+    const { biggestX, biggestY, smallestX, smallestY } = findMinMaxCoordinates(areas, null) as IMInMax;
     if (
       smallestX < floorProps.x ||
       biggestX > floorProps.x + floorProps.width ||

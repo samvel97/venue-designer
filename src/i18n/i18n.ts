@@ -8,16 +8,11 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    debug: false,
     fallbackLng: "en",
-    supportedLngs: ["en", "ru", "hy"],
-    ns: ["translations"],
-    interpolation: {
-      escapeValue: false,
-    },
-    backend: {
-      loadPath: `${process.env.PUBLIC_URL}/locale/{{lng}}.json`,
-    },
+    supportedLngs: ["en"],
+    nonExplicitSupportedLngs: true,
+    interpolation: { escapeValue: false },
+    backend: { loadPath: `${import.meta.env.BASE_URL}locale/{{lng}}.json` },
     detection: {
       order: ["localStorage", "navigator"],
       lookupLocalStorage: "locale",

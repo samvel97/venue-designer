@@ -1,5 +1,5 @@
-import { RowTypeEnums } from "Layout/Layout/Seats/constants/seatsConstants";
-import { IRowData, ISeatsData } from "Layout/Layout/Seats/types/seatsTypes";
+import { type RowTypeEnums } from "@/Layout/Layout/Seats/constants/seatsConstants";
+import { type IRowData, type ISeatsData } from "@/Layout/Layout/Seats/types/seatsTypes";
 import { isContinuousNumbering } from "./seatNumbering";
 
 /** Seat-editor coordinate of the selected area's top-left corner. */
@@ -45,76 +45,53 @@ export function generateLinesAndSeats({
   // does not cover them; the first block starts at the area's top-left.
   const lowestSeatY = existingRowsBottom(seatsRows);
   const originY =
-    lowestSeatY === null
-      ? AREA_ORIGIN
-      : lowestSeatY - seatRadius + 2 * Math.abs(multipleSeatsAndRows.lineSpacing);
+    lowestSeatY === null ? AREA_ORIGIN : lowestSeatY - seatRadius + 2 * Math.abs(multipleSeatsAndRows.lineSpacing);
 
-  const getPosition = (
-    origin: number,
-    index: number,
-    count: number,
-    spacing: number
-  ): number => {
-    return spacing < 0
-      ? origin + (count - index - 1) * Math.abs(spacing)
-      : origin + index * spacing;
+  const getPosition = (origin: number, index: number, count: number, spacing: number): number => {
+    return spacing < 0 ? origin + (count - index - 1) * Math.abs(spacing) : origin + index * spacing;
   };
 
   const continuous = isContinuousNumbering(rowByOrder);
-  let currentSeatOrder = continuous
-    ? seatsRows?.at(-1)?.seats?.at(-1)?.seatOrder ?? 0
-    : 0;
+  let currentSeatOrder = continuous ? (seatsRows?.at(-1)?.seats?.at(-1)?.seatOrder ?? 0) : 0;
 
-  return Array.from(
-    { length: multipleSeatsAndRows.linesCount },
-    (_, lineIndex) => {
-      const y = getPosition(
-        originY,
-        lineIndex,
-        multipleSeatsAndRows.linesCount,
-        multipleSeatsAndRows.lineSpacing
+  return Array.from({ length: multipleSeatsAndRows.linesCount }, (_, lineIndex) => {
+    const y = getPosition(originY, lineIndex, multipleSeatsAndRows.linesCount, multipleSeatsAndRows.lineSpacing);
+
+    const seats: ISeatsData[] = Array.from({ length: multipleSeatsAndRows.seatsCountPerLine }, (_, seatIndex) => {
+      const x = getPosition(
+        originX,
+        seatIndex,
+        multipleSeatsAndRows.seatsCountPerLine,
+        multipleSeatsAndRows.seatSpacing,
       );
-
-      const seats: ISeatsData[] = Array.from(
-        { length: multipleSeatsAndRows.seatsCountPerLine },
-        (_, seatIndex) => {
-          const x = getPosition(
-            originX,
-            seatIndex,
-            multipleSeatsAndRows.seatsCountPerLine,
-            multipleSeatsAndRows.seatSpacing
-          );
-          const seatOrder = continuous ? ++currentSeatOrder : seatIndex + 1;
-
-          return {
-            localId: seatIndex,
-            seatOrder,
-            properties: {
-              x,
-              y: y + seatRadius,
-              width: seatWidth,
-              height: seatWidth,
-            },
-          };
-        }
-      );
-
-      const rowWidth =
-        multipleSeatsAndRows.seatsCountPerLine *
-          Math.abs(multipleSeatsAndRows.seatSpacing) -
-        Math.abs(multipleSeatsAndRows.seatSpacing);
+      const seatOrder = continuous ? ++currentSeatOrder : seatIndex + 1;
 
       return {
-        localId: `${nextIdRef.current + lineIndex}_${selectedAreaId}`,
-        rowOrder: String(seatsRows.length + 1 + lineIndex),
+        localId: seatIndex,
+        seatOrder,
         properties: {
-          width: rowWidth,
+          x,
+          y: y + seatRadius,
+          width: seatWidth,
           height: seatWidth,
-          rotate: 0,
-          curve: 0,
         },
-        seats,
       };
-    }
-  );
+    });
+
+    const rowWidth =
+      multipleSeatsAndRows.seatsCountPerLine * Math.abs(multipleSeatsAndRows.seatSpacing) -
+      Math.abs(multipleSeatsAndRows.seatSpacing);
+
+    return {
+      localId: `${nextIdRef.current + lineIndex}_${selectedAreaId}`,
+      rowOrder: String(seatsRows.length + 1 + lineIndex),
+      properties: {
+        width: rowWidth,
+        height: seatWidth,
+        rotate: 0,
+        curve: 0,
+      },
+      seats,
+    };
+  });
 }

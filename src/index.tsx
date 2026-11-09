@@ -1,25 +1,29 @@
-import ReactDOM from "react-dom/client";
-import { HashRouter } from "react-router-dom";
-import App from "App";
-import "./assets/style/index.scss";
-import "./index.scss";
-import "./i18n/i18n";
-import { store } from "store/store";
+import { StrictMode, Suspense } from "react";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import React, { Suspense } from "react";
-import SnackBar from "components/ui/SnackBar/SnackBar";
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <Suspense fallback={<div />}>
-      <HashRouter>
-        <Provider store={store}>
-          <SnackBar />
-          <App />
-        </Provider>
-      </HashRouter>
-    </Suspense>
-  </React.StrictMode>
+import { HashRouter } from "react-router";
+import { Toaster } from "sonner";
+import App from "@/App";
+import { TooltipProvider } from "@/components/primitives/tooltip";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import { store } from "@/store/store";
+import "@/i18n/i18n";
+import "@fontsource-variable/inter";
+import "./index.css";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <ErrorBoundary>
+      <Suspense>
+        <HashRouter>
+          <Provider store={store}>
+            <TooltipProvider delayDuration={300}>
+              <App />
+              <Toaster position="top-right" richColors closeButton />
+            </TooltipProvider>
+          </Provider>
+        </HashRouter>
+      </Suspense>
+    </ErrorBoundary>
+  </StrictMode>,
 );

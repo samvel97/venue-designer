@@ -1,13 +1,13 @@
 import { memo } from "react";
-import SvgPathElement from "components/ui/SvgPathElement/SvgPathElement";
+import SvgPathElement from "@/components/canvas/SvgPathElement";
 import {
   ShapeType,
   presentationBackgroundColor,
   presentationStrokeColor,
-} from "Layout/Layout/Areas/constants/areasConstants";
-import { FloorPropTypes } from "Layout/Layout/Areas/types/areasTypes";
-import SvgEllipseElement from "components/ui/SvgEllipseElement/SvgEllipseElement";
-import { toolType } from "types/types";
+} from "@/Layout/Layout/Areas/constants/areasConstants";
+import { type FloorPropTypes } from "@/Layout/Layout/Areas/types/areasTypes";
+import SvgEllipseElement from "@/components/canvas/SvgEllipseElement";
+import { toolType } from "@/types/types";
 type Props = {
   floorProperties: FloorPropTypes;
   fillColor?: string;
@@ -39,11 +39,7 @@ const Floor = ({ floorProperties, fillColor }: Props) => {
       />
     ),
   };
-  return (
-    <>
-      {backgroundShape[floorProperties?.type as keyof typeof backgroundShape]}
-    </>
-  );
+  return <>{backgroundShape[floorProperties?.type as keyof typeof backgroundShape]}</>;
 };
 
 export default memo(Floor);

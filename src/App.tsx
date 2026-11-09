@@ -1,30 +1,26 @@
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { VenueRoutes } from "route/route";
-import { DEFAULT_VENUE_ID } from "config";
+import { lazy, useEffect } from "react";
+import { Route, Routes, useSearchParams } from "react-router";
+import { DEFAULT_VENUE_ID } from "@/config";
+import Areas from "@/Layout/Layout/Areas/Areas";
 
-function App() {
-  const [searchParams, setSearchParams] = useSearchParams();
+const Seats = lazy(() => import("@/Layout/Layout/Seats/Seats"));
 
-  // The editor is always scoped to a venue and a floor; open the demo venue
-  // when the URL does not specify one.
+const App = () => {
+  const [params, setParams] = useSearchParams();
+
   useEffect(() => {
-    if (!searchParams.get("id") || !searchParams.get("floor")) {
-      setSearchParams(
-        {
-          id: searchParams.get("id") || DEFAULT_VENUE_ID,
-          floor: searchParams.get("floor") || "1",
-        },
-        { replace: true }
-      );
+    if (!params.get("id") || !params.get("floor")) {
+      setParams({ id: params.get("id") || DEFAULT_VENUE_ID, floor: params.get("floor") || "1" }, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [params, setParams]);
 
   return (
-    <div className="chartdesigner svgContainer">
-      <VenueRoutes />
-    </div>
+    <Routes>
+      <Route path="/" element={<Areas />} />
+      <Route path="/seats/:id" element={<Seats />} />
+      <Route path="*" element={<p className="text-muted-foreground grid h-full place-items-center">Not found</p>} />
+    </Routes>
   );
-}
+};
 
 export default App;

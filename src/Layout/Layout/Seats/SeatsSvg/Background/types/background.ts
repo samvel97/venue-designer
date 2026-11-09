@@ -1,25 +1,22 @@
-import { IAreaData } from "Layout/Layout/Areas/types/areasTypes";
+import { type IAreaData } from "@/Layout/Layout/Areas/types/areasTypes";
 
 export interface IBackground {
-    d: any;
-    rotate: any;
-    centerX: any;
-    centerY: any;
-    width: any;
-    height: any;
-  }
-
-  export interface ICoordinates extends Omit<IBackground, 'd'> {
-   x: number;
-   y: number;
-  }
-
-  export interface ITypes {
-    type: string;
-  }
-export type BackgroundType = {
-  d:string
-  selectedArea:IAreaData
-  centerX: any;
-  centerY: any;
+  d: string;
+  rotate: number;
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
 }
+
+export interface ICoordinates extends Omit<IBackground, "d"> {
+  x: number;
+  y: number;
+}
+
+export type BackgroundType = {
+  d: string;
+  selectedArea: IAreaData;
+  centerX: number;
+  centerY: number;
+};
