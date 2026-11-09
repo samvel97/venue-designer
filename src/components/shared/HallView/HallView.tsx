@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LoaderCircle, Maximize, Minus, Plus } from "lucide-react";
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
@@ -12,6 +12,7 @@ import { binaryToText } from "@/utils";
 import { findMinMaxCoordinates } from "@/utils/areasMinMaxCoords";
 import { shapeCenter } from "@/utils/shapeCenter";
 import Areas from "./Areas/Areas";
+import { measureViewport, type Viewport } from "./viewport";
 
 const PADDING = 100;
 
@@ -75,6 +76,23 @@ const HallView = ({ venueId }: { venueId: string }) => {
     };
   }, [selectedFloor, single.data, all.data]);
 
+  const frameRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const timerRef = useRef<number>(undefined);
+  const [viewport, setViewport] = useState<Viewport | null>(null);
+
+  const scheduleMeasure = useCallback(() => {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      if (svgRef.current && frameRef.current) setViewport(measureViewport(svgRef.current, frameRef.current));
+    }, 120);
+  }, []);
+
+  useEffect(() => {
+    scheduleMeasure();
+    return () => window.clearTimeout(timerRef.current);
+  }, [layouts, scheduleMeasure]);
+
   const floorOptions = [
     { value: 0, label: floorsCount > 1 ? t("rightSide.view") : `${t("rightSide.floor")} 1` },
     ...(floorsCount > 1
@@ -84,17 +102,18 @@ const HallView = ({ venueId }: { venueId: string }) => {
 
   return (
     <div className="flex min-h-0 gap-4 px-6 pb-6">
-      <div className="border-border bg-canvas relative flex-1 overflow-hidden rounded-xl border">
-        <TransformWrapper centerOnInit centerZoomedOut minScale={0.5}>
+      <div ref={frameRef} className="border-border bg-canvas relative flex-1 overflow-hidden rounded-xl border">
+        <TransformWrapper centerOnInit centerZoomedOut minScale={0.5} maxScale={40} onTransform={scheduleMeasure}>
           <ZoomControls />
           <TransformComponent wrapperClass="!size-full" contentClass="!size-full">
-            <svg className="size-full" viewBox={viewBox}>
+            <svg ref={svgRef} className="size-full" viewBox={viewBox}>
               {layouts.map((layout) => (
                 <Areas
                   key={layout.floor}
                   areas={layout.areas}
                   floor={layout.properties}
                   fillColor={layout.floor !== 1 ? opacityFillColor : undefined}
+                  viewport={viewport}
                 />
               ))}
             </svg>

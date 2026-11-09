@@ -196,12 +196,6 @@ export const useSeats = () => {
     setMultipleSelectedRowsArea(selectedRowsArea);
     setSeatsType(toolType.select_rows);
   }, [multipleSeatsAndRows, selectedArea, seatsRows]);
-  const chooseSeats = useCallback(() => {
-    if (seatsType === toolType.select_seats) {
-      setSelectedRows([]);
-      handlingSelectedRowsProps([], selectedRowData);
-    }
-  }, [seatsType, selectedRowData]);
   const getCoordsforResizing = useCallback((e: React.MouseEvent, actionName: TActionType) => {
     e.preventDefault();
     actionsRef.current = actionName;
@@ -948,7 +942,6 @@ export const useSeats = () => {
     rowByOrder,
     handleSubmit,
     pathMouseDown,
-    chooseSeats,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,

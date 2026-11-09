@@ -1,11 +1,12 @@
-import { Fragment, type Ref } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, type MouseEvent as ReactMouseEvent, type Ref } from "react";
+import { hasRotatedItem } from "@/utils/hasRotatedRow";
 import { roundedRectPath } from "@/utils/roundedRectPath";
 import Background from "./Background/Background";
 import AreaForSelectingRows from "./AreaForSelectingRows/AreaForSelectingRows";
 import MultipleSelectedRowsArea from "./MultipleSelectedRowsArea/MultipleSelectedRowsArea";
 import TempSeats from "./TempSeats/TempSeats";
 import { type IAreaData } from "../../Areas/types/areasTypes";
-import { type IRowData, type ISeatsData, type TActionType } from "../types/seatsTypes";
+import { type IRowData, type TActionType } from "../types/seatsTypes";
 import RowsComponent from "./Rows/RowsComponent";
 import { type IStandardProperties } from "@/types/types";
 import CoordinateAxis from "./CoordinateAxis/CoordinateAxis";
@@ -27,7 +28,6 @@ interface ISeatsSvg {
   seatsSpacing: number;
   seatsType: string;
   pathMouseDown: (e: React.MouseEvent, selectedRow: IRowData) => void;
-  chooseSeats: (seat: ISeatsData) => void;
   handleMouseDown: (e: React.MouseEvent<Element, MouseEvent>) => void;
   handleMouseMove: (e: React.MouseEvent<Element, MouseEvent>) => void;
   handleMouseUp: (e: React.MouseEvent<Element, MouseEvent>) => void;
@@ -49,12 +49,23 @@ const SeatsSvg = ({
   seatsSpacing,
   seatsType,
   pathMouseDown,
-  chooseSeats,
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
   getCoordsforResizing,
 }: ISeatsSvg) => {
+  const handlers = useRef({ pathMouseDown, getCoordsforResizing });
+  useLayoutEffect(() => {
+    handlers.current = { pathMouseDown, getCoordsforResizing };
+  });
+  const onRowMouseDown = useCallback((e: ReactMouseEvent, row: IRowData) => handlers.current.pathMouseDown(e, row), []);
+  const onResizeMouseDown = useCallback(
+    (e: ReactMouseEvent, action: TActionType) => handlers.current.getCoordsforResizing(e, action),
+    [],
+  );
+  const selectedIds = useMemo(() => new Set(selectedRows.map((row) => row.localId)), [selectedRows]);
+  const rotatedSelection = hasRotatedItem(selectedRows);
+
   const {
     width,
     height,
@@ -94,18 +105,20 @@ const SeatsSvg = ({
       <Background d={d} selectedArea={selectedArea} centerX={centerX} centerY={centerY} />
       {multipleSelectArea ? <AreaForSelectingRows selectionRect={selectionRect} /> : null}
 
-      {seatsRows.map((row: IRowData) => (
-        <Fragment key={row.localId}>
+      {seatsRows.map((row) => {
+        const isSelected = selectedIds.has(row.localId);
+        return (
           <RowsComponent
+            key={row.localId}
             row={row}
-            selectedRows={selectedRows}
-            resize={resize}
-            pathMouseDown={pathMouseDown}
-            getCoordsforResizing={getCoordsforResizing}
-            chooseSeats={chooseSeats}
+            isSelected={isSelected}
+            showResize={!rotatedSelection}
+            dimmed={isSelected && !!resize}
+            pathMouseDown={onRowMouseDown}
+            getCoordsforResizing={onResizeMouseDown}
           />
-        </Fragment>
-      ))}
+        );
+      })}
       {tempSeats.length ? (
         <TempSeats
           tempSeats={tempSeats}

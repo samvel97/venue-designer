@@ -129,7 +129,6 @@ const Seats = () => {
             resize={editor.resize}
             seatsType={seatsType}
             pathMouseDown={editor.pathMouseDown}
-            chooseSeats={editor.chooseSeats}
             handleMouseDown={editor.handleMouseDown}
             handleMouseMove={editor.handleMouseMove}
             handleMouseUp={editor.handleMouseUp}
